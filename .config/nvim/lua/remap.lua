@@ -1,5 +1,5 @@
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>fe", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>fe", vim.cmd.NERDTreeToggle)
 vim.keymap.set('n', '<leader><F5>', vim.cmd.UndotreeToggle)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")

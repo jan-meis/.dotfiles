@@ -90,7 +90,12 @@ require('lspconfig').lua_ls.setup({
   end,
 })
 
-
+require("lspconfig").clangd.setup {
+    cmd = {
+        "clangd",
+        "--fallback-style=webkit"
+    }
+}
 
 
 local cmp = require('cmp')
