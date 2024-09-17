@@ -1,2 +1,3 @@
 .config/nvim
 /.tmux.conf
+/.toggleTouchpad.sh
