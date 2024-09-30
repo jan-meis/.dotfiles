@@ -1,4 +1,5 @@
 .config/nvim
+.config/alacritty
 .config/i3
 .config/i3status
 /.tmux.conf

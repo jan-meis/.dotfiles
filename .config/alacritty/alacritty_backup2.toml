@@ -1,0 +1,13 @@
+[colors.primary]
+background = "0x1F1F28"
+foreground = "0xD0CFCC"
+
+[font]
+size = 16
+
+[font.normal]
+family = "IosevkaTerm NF"
+style = "Regular"
+
+[keyboard]
+bindings = [ { key = "{", mods =  "Control", chars =  "\u001B[123;4u" } ]

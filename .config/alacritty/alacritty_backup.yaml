@@ -1,0 +1,12 @@
+font:
+  normal:
+    family: IosevkaTerm NF
+    style: Regular
+  size: 16
+colors:
+  primary:
+    foreground: '0xD0CFCC'
+    background: '0x1F1F28'
+keyboard:
+  bindings:
+    - { key: '{', mods: Control, chars: "\x1b[123;4u" } 

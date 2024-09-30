@@ -1,0 +1,5 @@
+[font]
+normal = {family = "IosevkaTerm NF", style = "Regular"}
+size=16
+[colors]
+primary = {foreground='#D0CFCC', background='#1F1F28'}
