@@ -1,5 +1,5 @@
 [font]
-normal = {family = "IosevkaTerm NF", style = "Regular"}
+normal = {family = "IosevkaTerm Nerd Font", style = "Regular"}
 size=16
 [colors]
 primary = {foreground='#D0CFCC', background='#1F1F28'}

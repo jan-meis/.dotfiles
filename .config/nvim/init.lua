@@ -66,6 +66,7 @@ require("lazy").setup({
       branch = "harpoon2",
       dependencies = { "nvim-lua/plenary.nvim" }
     },
+    { "lambdalisue/vim-suda" },
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.
