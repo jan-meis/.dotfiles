@@ -56,11 +56,11 @@ xkb_symbols "nodeadkeys" {
 
     key <TLDE>	{ [asciicircum,     degree,              notsign,     notsign ]	};
     key <AE12>	{ [      grave,      acute,              cedilla,     cedilla ]	};
-    key <AD11>	{ [  diaeresis,  diaeresis,           udiaeresis,  Udiaeresis ] };
+    key <AD11>	{ [ udiaeresis, Udiaeresis,            diaeresis,   diaeresis ]	};
     key <AD12>	{ [       plus,   asterisk,           asciitilde,      macron ]	};
     key <AC07>	{ [          j,          J,                  ezh,         EZH ] };
-    key <AC10>	{ [  braceleft, bracketleft,          odiaeresis,  Odiaeresis ]	};
-    key <AC11>	{ [ braceright, bracketright,         adiaeresis,  Adiaeresis ]	};
+    key <AC10>	{ [ odiaeresis, Odiaeresis,          doubleacute, doubleacute ]	};
+    key <AC11>	{ [ adiaeresis, Adiaeresis,          asciicircum, asciicircum ]	};
     key <BKSL>	{ [ numbersign, apostrophe, rightsinglequotemark,       grave ]	};
     key <LSGT>	{ [       less,    greater,                  bar,      dagger ] };
 };
