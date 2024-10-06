@@ -3,7 +3,7 @@ local wezterm = require 'wezterm'
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 config.font = wezterm.font {
-    family = 'Iosevka Term',
+    family = 'IosevkaTerm NF',
     weight = 'Regular'
 }
 config.font_size = 16
@@ -37,7 +37,11 @@ config.wsl_domains = {
     default_prog = {"bash"}
   },
 }
-config.default_domain = 'WSL:Ubuntu'
+config.launch_menu = {
+  {
+	  args = {'eledo.exe', 'cmd.exe'}
+  }
+}
 config.force_reverse_video_cursor = true
 config.colors = {
 		foreground = "#dcd7ba",
