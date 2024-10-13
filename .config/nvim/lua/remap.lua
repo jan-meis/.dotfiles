@@ -11,11 +11,13 @@ local function toggleQuickfix()
     vim.cmd.cclose()
   end
 end
-
 vim.keymap.set("n", "<leader>qf", toggleQuickfix, { desc = "Toggle quickfix list" })
 vim.keymap.set("n", "<leader>qn", vim.cmd.cnext, { desc = "Next quickfix item" })
 vim.keymap.set("n", "<leader>qp", vim.cmd.cprev, { desc = "Previous quickfix item" })
-vim.keymap.set("n", "<leader>fe", vim.cmd.NERDTreeToggle, { desc = "Open file explorer" })
+vim.keymap.set("n", "<leader>ft", require("nvim-tree.api").tree.toggle, { desc = "Open file explorer" })
+vim.keymap.set("n", "<space>fe", function()
+	require("telescope").extensions.file_browser.file_browser()
+end)
 vim.keymap.set('n', '<leader><F5>', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection up" })

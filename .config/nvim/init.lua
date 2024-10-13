@@ -39,8 +39,27 @@ require("lazy").setup({
     { 'hrsh7th/nvim-cmp' },
     { 'hrsh7th/cmp-cmdline' },
     { 'hrsh7th/cmp-path' },
-    { 'preservim/nerdtree' },
-    { 'kevinhwang91/nvim-bqf',            ft = 'qf' },
+    {
+      "nvim-telescope/telescope-file-browser.nvim",
+      dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+    },
+    {
+      "nvim-tree/nvim-tree.lua",
+      version = "*",
+      lazy = false,
+      dependencies = {
+        "nvim-tree/nvim-web-devicons",
+      },
+      config = function()
+        require("nvim-tree").setup {
+          hijack_directories = {
+            enable = false,
+            auto_open = false,
+          },
+        }
+      end,
+    },
+    { 'kevinhwang91/nvim-bqf', ft = 'qf' },
     { 'junegunn/fzf' },
     {
       "folke/which-key.nvim",
