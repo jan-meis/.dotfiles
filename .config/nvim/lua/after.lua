@@ -10,7 +10,11 @@ vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
+if (os.getenv("UNDODIR") ~= nil) then 
+  vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
+else 
+  vim.opt.undodir = os.getenv("HOME") .. "/.local/nvim/undodir"
+end
 vim.opt.undofile = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true

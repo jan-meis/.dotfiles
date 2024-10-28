@@ -38,7 +38,10 @@ vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete to void regi
 vim.keymap.set("n", "<Esc>", "<Esc>:noh<CR>")
 vim.keymap.set("n", "<leader>{", "A{<CR>}<Esc>O")
 vim.keymap.set({"i"}, "<C-{>", "{<CR>}<Esc>O")
-
+vim.keymap.set({"n", "v", "x", "i"}, "ö",  "{")
+vim.keymap.set({"n", "v", "x", "i"}, "ä",  "}")
+vim.keymap.set({"n", "v", "x", "i"}, "Ö",  "[")
+vim.keymap.set({"n", "v", "x", "i"}, "Ä",  "]")
 
 
 
