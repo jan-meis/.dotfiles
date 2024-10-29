@@ -21,7 +21,7 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "80"
+vim.opt.colorcolumn = "100"
 
 -- vim.g.NERDTreeQuitOnOpen = 1
 vim.g.undotree_SetFocusWhenToggle = 1
@@ -274,6 +274,11 @@ vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc
 vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Go to 3. harpoon list entry" })
 vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Go to 4. harpoon list entry" })
 vim.keymap.set("n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Go to 5. harpoon list entry" })
+vim.keymap.set("n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Go to 1. harpoon list entry" })
+vim.keymap.set("n", "<leader>7", function() harpoon:list():select(7) end, { desc = "Go to 2. harpoon list entry" })
+vim.keymap.set("n", "<leader>8", function() harpoon:list():select(8) end, { desc = "Go to 3. harpoon list entry" })
+vim.keymap.set("n", "<leader>9", function() harpoon:list():select(9) end, { desc = "Go to 4. harpoon list entry" })
+vim.keymap.set("n", "<leader>0", function() harpoon:list():select(10) end, { desc = "Go to 5. harpoon list entry" })
 
 -- Toggle previous & next buffers stored within Harpoon list
 vim.keymap.set("n", "<leader>n", function() harpoon:list():prev() end, { desc = "Go to next harpoon list entry" })
