@@ -12,6 +12,8 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
+export EDITOR=nvim
+
 
 # HISTORY SETTINGS
 # don't put duplicate lines or lines starting with space in the history.
