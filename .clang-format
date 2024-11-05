@@ -1,0 +1,106 @@
+# =========================================================================
+# DO NOT CHANGE unless instructed by the monkey gods
+# =========================================================================
+# Style usable inside the kernel. Currently maintained by the KRN-DBI team.
+# Uses clang-format version 15 !
+BasedOnStyle: LLVM
+
+# Basic settings
+Language: Cpp
+Standard: c++14
+ColumnLimit: 100
+IndentWidth: 2
+ContinuationIndentWidth: 4
+UseTab: Never
+PointerAlignment: Right
+BreakBeforeBraces: Allman
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+# InsertBraces: true # TODO: would be nice :-)
+
+# Indentation
+IndentAccessModifiers: false
+IndentCaseLabels: true
+IndentCaseBlocks: false
+IndentPPDirectives: None
+IndentRequiresClause: true
+NamespaceIndentation: None
+LambdaBodyIndentation: Signature
+ConstructorInitializerIndentWidth: 2
+
+# Alignment
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Right
+AlignArrayOfStructures: Right
+AlignOperands: true
+AlignTrailingComments: true
+
+# Short forms
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
+
+# Spacing
+BitFieldColonSpacing: Both
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDefinitionName: false
+  AfterIfMacros: true
+SpaceInEmptyBlock: true
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+SeparateDefinitionBlocks: Always
+
+# Arguments & parameters
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackArguments: false
+BinPackParameters: false
+
+# Preprocessor directives
+IncludeBlocks: Preserve
+SortIncludes: Never
+
+# Line breaks
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: Yes
+BreakInheritanceList: AfterComma
+BreakConstructorInitializers: BeforeComma
+BreakBeforeTernaryOperators: true
+BreakBeforeBinaryOperators: NonAssignment
+
+# Others
+PackConstructorInitializers: Never
+SortUsingDeclarations: false
+Cpp11BracedListStyle: true
+
+# Macros
+StatementMacros:
+  - 'DBI_ACCEPT_VISITOR'
+  - 'DBI_ACCEPT_CONST_VISITOR'
+  - 'DBI_ACCEPT_NO_CONST_VISITOR'
+  - 'DBI_AST_FRIENDS'
+
+# Penalties
+PenaltyBreakBeforeFirstCallParameter: 1000
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 1000

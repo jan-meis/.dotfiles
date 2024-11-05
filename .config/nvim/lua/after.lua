@@ -119,6 +119,7 @@ require('lspconfig').lua_ls.setup({
 require("lspconfig").clangd.setup {
   cmd = {
     "clangd",
+    "--enable-config",
     "--fallback-style=llvm"
   }
 }
