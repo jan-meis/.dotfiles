@@ -85,6 +85,7 @@ require("lazy").setup({
       dependencies = { "nvim-lua/plenary.nvim" }
     },
     { "lambdalisue/vim-suda" },
+--    { "ActivityWatch/aw-watcher-vim" },
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.
@@ -94,3 +95,4 @@ require("lazy").setup({
 })
 require("after")
 require("remap")
+require("tmp")

@@ -10,9 +10,9 @@ vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
-if (os.getenv("UNDODIR") ~= nil) then 
+if (os.getenv("UNDODIR") ~= nil) then
   vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
-else 
+else
   vim.opt.undodir = os.getenv("HOME") .. "/.local/nvim/undodir"
 end
 vim.opt.undofile = true
@@ -81,7 +81,7 @@ local lsp_attach = function(client, bufnr)
     { buffer = bufnr, desc = "Show occurrences of this object" })
   vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', { buffer = bufnr, desc = "Signature help" })
   vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', { buffer = bufnr, desc = "Rename in buffer" })
-  vim.keymap.set({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
+  vim.keymap.set({ 'n', 'x', 'v' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
     { buffer = bufnr, desc = "Format buffer" })
   vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', { buffer = bufnr, desc = "Apply suggested fix" })
   vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>',

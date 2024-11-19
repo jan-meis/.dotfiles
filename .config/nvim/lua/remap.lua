@@ -33,16 +33,13 @@ vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank to clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", [["+p]], { desc = "Paste from clipboard (after)" })
 vim.keymap.set({ "n", "v" }, "<leader>P", [["+P]], { desc = "Paste from clipboard (before)" })
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete to void register" })
---vim.keymap.set({"n", "v", "x", "i"}, "´",  "`")
---vim.keymap.set({"n", "v", "x", "i"}, "`",  "´")
+vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
+vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set("n", "<Esc>", "<Esc>:noh<CR>")
-vim.keymap.set("n", "<leader>{", "A{<CR>}<Esc>O")
-vim.keymap.set({"i"}, "<C-{>", "{<CR>}<Esc>O")
+vim.keymap.set("n", "<leader>ö", "o{<CR>}<Esc>O")
 vim.keymap.set({"n", "v", "x", "i"}, "ö",  "{")
 vim.keymap.set({"n", "v", "x", "i"}, "ä",  "}")
 vim.keymap.set({"n", "v", "x", "i"}, "Ö",  "[")
 vim.keymap.set({"n", "v", "x", "i"}, "Ä",  "]")
-
-
 
 vim.opt.langmap = "-/_?#*'#"
