@@ -11,6 +11,15 @@ local function toggleQuickfix()
     vim.cmd.cclose()
   end
 end
+
+local function getFilePathAndLineNumber()
+  local ret = vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
+  vim.fn.setreg("+", ret)
+  print(string.format("Copied %s to clipboard.", ret))
+end
+
+vim.keymap.set("n", "<leader>cl", getFilePathAndLineNumber, { desc = "Copy line number and file path" })
+
 vim.keymap.set("n", "<leader>qf", toggleQuickfix, { desc = "Toggle quickfix list" })
 vim.keymap.set("n", "<leader>qn", vim.cmd.cnext, { desc = "Next quickfix item" })
 vim.keymap.set("n", "<leader>qp", vim.cmd.cprev, { desc = "Previous quickfix item" })
