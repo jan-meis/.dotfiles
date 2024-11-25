@@ -23,6 +23,9 @@ vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "100"
 
+-- turn off copilt by default
+vim.cmd("Copilot disable")
+
 -- vim.g.NERDTreeQuitOnOpen = 1
 vim.g.undotree_SetFocusWhenToggle = 1
 

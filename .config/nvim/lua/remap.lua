@@ -1,3 +1,31 @@
+-- Github Copilot settings
+vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false
+})
+vim.g.copilot_no_tab_map = true
+vim.keymap.set({'n', 'i'}, '<F12>',
+function()
+  vim.cmd("Copilot enable")
+  print("Copilot enabled")
+end, {desc = "Enable Copilot"})
+vim.keymap.set({'n', 'i'}, '<C-F12>',
+function()
+  vim.cmd("Copilot disable")
+  print("Copilot disabled")
+end, {desc = "Disable Copilot"})
+vim.keymap.set('i', '<F8>', '<Plug>(copilot-suggest)', {desc = "Suggest copilot completion"})
+vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false,
+  desc = "Accept copilot completion"
+})
+vim.keymap.set('i', '<C-F9>', '<Plug>(copilot-next)', {desc = "Next copilot suggestion"})
+vim.keymap.set('i', '<C-F8>', '<Plug>(copilot-previous)', {desc = "Previous copilot suggestion"})
+vim.keymap.set('i', '<F10>', '<Plug>(copilot-dismiss)', {desc = "Dismiss copilot suggestion"})
+vim.keymap.set('i', '<M-F9>', '<Plug>(copilot-accept-word)', {desc = "Accept copilot word"})
+vim.keymap.set('i', '<M-C-F9>', '<Plug>(copilot-accept-line)', {desc = "Accept copilot line"})
+
 
 local function toggleQuickfix()
   local qfopen = false
@@ -33,7 +61,8 @@ end
 local function openGDB()
   local ret = vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
   vim.cmd('silent !tmux new-window -dn gdb')
-  vim.cmd('silent !tmux send-keys -t gdb "gdb -ex \\"break \\$CURRENT_BREAKPOINT\\" -ex run --args \\$CURRENT_TESTPROG --gtest_filter=\\$CURRENT_TEST"')
+  vim.cmd(
+    'silent !tmux send-keys -t gdb "gdb -ex \\"break \\$CURRENT_BREAKPOINT\\" -ex run --args \\$CURRENT_TESTPROG --gtest_filter=\\$CURRENT_TEST"')
   vim.cmd('silent !tmux select-window -t gdb')
 end
 
@@ -47,7 +76,7 @@ vim.keymap.set("n", "<leader>qn", vim.cmd.cnext, { desc = "Next quickfix item" }
 vim.keymap.set("n", "<leader>qp", vim.cmd.cprev, { desc = "Previous quickfix item" })
 vim.keymap.set("n", "<leader>ft", require("nvim-tree.api").tree.toggle, { desc = "Open file explorer" })
 vim.keymap.set("n", "<space>fe", function()
-	require("telescope").extensions.file_browser.file_browser()
+  require("telescope").extensions.file_browser.file_browser()
 end)
 vim.keymap.set('n', '<leader><F5>', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
 
@@ -68,10 +97,10 @@ vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set("n", "<Esc>", "<Esc>:noh<CR>")
 vim.keymap.set("n", "<leader>ö", "o{<CR>}<Esc>O")
-vim.keymap.set({"n", "v", "x", "i"}, "ö",  "{")
-vim.keymap.set({"n", "v", "x", "i"}, "ä",  "}")
-vim.keymap.set({"n", "v", "x", "i"}, "Ö",  "[")
-vim.keymap.set({"n", "v", "x", "i"}, "Ä",  "]")
+vim.keymap.set({ "n", "v", "x", "i" }, "ö", "{")
+vim.keymap.set({ "n", "v", "x", "i" }, "ä", "}")
+vim.keymap.set({ "n", "v", "x", "i" }, "Ö", "[")
+vim.keymap.set({ "n", "v", "x", "i" }, "Ä", "]")
 
 -- vim.opt.langmap = "-/_?#*'#"
 vim.opt.langmap = "-/_?"
