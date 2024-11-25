@@ -1,3 +1,4 @@
+
 local function toggleQuickfix()
   local qfopen = false
   for id, w in pairs(vim.api.nvim_list_wins()) do
@@ -12,13 +13,34 @@ local function toggleQuickfix()
   end
 end
 
+local function getCurrentTest()
+  vim.fn.feedkeys('mx?TEST_\rf(l"cywf,w"vyw`x', "x")
+  vim.cmd("noh")
+  local ret = (vim.fn.getreg("c") .. "." .. vim.fn.getreg("v"))
+  vim.cmd('silent !tmux setenv -g CURRENT_TEST ' .. ret)
+  vim.cmd('silent !tmux send-keys -t 1 "export CURRENT_TEST=' .. ret .. '" C-m')
+  print(string.format("Set $CURRENT_TEST to %s.", ret))
+end
+
 local function getFilePathAndLineNumber()
   local ret = vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
   vim.fn.setreg("+", ret)
-  print(string.format("Copied %s to clipboard.", ret))
+  vim.cmd('silent !tmux setenv -g CURRENT_BREAKPOINT ' .. ret)
+  vim.cmd('silent !tmux send-keys -t 1 "export CURRENT_BREAKPOINT=' .. ret .. '" C-m')
+  vim.cmd.print(string.format("Set %CURRENT_BREAKPOINT to %s.", ret))
 end
 
-vim.keymap.set("n", "<leader>cl", getFilePathAndLineNumber, { desc = "Copy line number and file path" })
+local function openGDB()
+  local ret = vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
+  vim.cmd('silent !tmux new-window -dn gdb')
+  vim.cmd('silent !tmux send-keys -t gdb "gdb -ex \\"break \\$CURRENT_BREAKPOINT\\" -ex run --args \\$CURRENT_TESTPROG --gtest_filter=\\$CURRENT_TEST"')
+  vim.cmd('silent !tmux select-window -t gdb')
+end
+
+
+vim.keymap.set("n", "<leader>sb", getFilePathAndLineNumber, { desc = "Copy line number and file path" })
+vim.keymap.set("n", "<leader>st", getCurrentTest, { desc = "Copy test name" })
+vim.keymap.set("n", "<leader>db", openGDB, { desc = "open GDB in new tmux pane" })
 
 vim.keymap.set("n", "<leader>qf", toggleQuickfix, { desc = "Toggle quickfix list" })
 vim.keymap.set("n", "<leader>qn", vim.cmd.cnext, { desc = "Next quickfix item" })
@@ -51,4 +73,5 @@ vim.keymap.set({"n", "v", "x", "i"}, "ä",  "}")
 vim.keymap.set({"n", "v", "x", "i"}, "Ö",  "[")
 vim.keymap.set({"n", "v", "x", "i"}, "Ä",  "]")
 
-vim.opt.langmap = "-/_?#*'#"
+-- vim.opt.langmap = "-/_?#*'#"
+vim.opt.langmap = "-/_?"

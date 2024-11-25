@@ -114,3 +114,12 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+tmux::send_keys_all() {
+    for _window in $(tmux list-windows -F '#I'); do
+        for _pane in $(tmux list-panes -t ${_window} -F '#P'); do
+            tmux send-keys -t ${_window}.${_pane} "$@"
+        done
+    done
+  }
+
