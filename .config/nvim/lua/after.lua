@@ -23,14 +23,32 @@ vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "100"
 
--- turn off copilt by default
-vim.cmd("Copilot disable")
 
 -- vim.g.NERDTreeQuitOnOpen = 1
 vim.g.undotree_SetFocusWhenToggle = 1
 
+-- turn off copilt by default
+vim.cmd("Copilot disable")
+
 -- Colors
+-- vim.api.nvim_create_autocmd('ColorScheme', {
+--   pattern = 'kanagawa-wave',
+--   callback = function()
+--     vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
+--       fg = '#c4b5c4',
+--       ctermfg = 8,
+--       force = true
+--     })
+--   end
+-- })
+
+vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
+  fg = '#c4b5c4',
+  ctermfg = 8,
+  force = true
+})
 vim.cmd("colorscheme kanagawa-wave")
+
 
 -- Telescope (fuzzy finder)
 local builtin = require('telescope.builtin')
@@ -188,9 +206,9 @@ cmp.setup({
       local win_width = vim.api.nvim_win_get_width(0)
 
       -- Set the max content width based on either: 'fixed_width'
-      -- or a percentage of the window width, in this case 20%.
+      -- or a percentage of the window width, in this case 25%.
       -- We subtract 10 from 'fixed_width' to leave room for 'kind' fields.
-      local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.2)
+      local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.25)
 
       -- Truncate the completion entry text if it's longer than the
       -- max content width. We subtract 3 from the max content width
@@ -201,11 +219,12 @@ cmp.setup({
         item.abbr = content .. (" "):rep(max_content_width - #content)
       end
 
+      local sig_mult = .8
       if sig ~= nil then
-        if #sig > max_content_width then
-          item.menu = vim.fn.strcharpart(sig, 0, max_content_width - 3) .. "..."
+        if #sig > math.floor(max_content_width*sig_mult) then
+          item.menu = vim.fn.strcharpart(sig, 0, math.floor(max_content_width*sig_mult) - 3) .. "..."
         else
-          item.menu = sig .. (" "):rep(max_content_width - #sig)
+          item.menu = sig .. (" "):rep(math.floor(max_content_width*sig_mult) - #sig)
         end
       end
       return item
