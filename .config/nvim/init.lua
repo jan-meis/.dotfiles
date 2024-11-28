@@ -85,7 +85,7 @@ require("lazy").setup({
       dependencies = { "nvim-lua/plenary.nvim" }
     },
     { "lambdalisue/vim-suda" },
-    --    { "ActivityWatch/aw-watcher-vim" },
+    { "ActivityWatch/aw-watcher-vim" },
     { "github/copilot.vim" },
   },
   -- Configure any other settings here. See the documentation for more details.
