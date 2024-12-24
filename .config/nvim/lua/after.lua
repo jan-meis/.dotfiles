@@ -1,4 +1,4 @@
--- Vim options
+
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -22,49 +22,35 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "100"
+vim.filetype.add({ extension = { gmk = "make" } })
 
-
--- vim.g.NERDTreeQuitOnOpen = 1
 vim.g.undotree_SetFocusWhenToggle = 1
-
--- turn off copilt by default
-vim.cmd("Copilot disable")
-
--- Colors
--- vim.api.nvim_create_autocmd('ColorScheme', {
---   pattern = 'kanagawa-wave',
---   callback = function()
---     vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
---       fg = '#c4b5c4',
---       ctermfg = 8,
---       force = true
---     })
---   end
--- })
-
-vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
-  fg = '#c4b5c4',
-  ctermfg = 8,
-  force = true
-})
 vim.cmd("colorscheme kanagawa-wave")
 
-
 -- Telescope (fuzzy finder)
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = "Find files" })
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = "Grep files" })
-vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = "Find in buffers" })
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = "Find help" })
 require("telescope").setup {
   extensions = {
     file_browser = {
       hidden = { file_browser = true, folder_browser = true },
     },
+    live_grep_args = {
+      auto_quoting = true, -- enable/disable auto-quoting
+      -- define mappings, e.g.
+      mappings = {         -- extend mappings
+        i = {
+          ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
+          ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix = " --iglob " }),
+          -- freeze the current list and start a fuzzy search in the frozen list
+          ["<C-Space>"] = require("telescope.actions").to_fuzzy_refine,
+        },
+      },
+    }
   },
 }
-require("telescope").load_extension "file_browser"
 
+require('telescope').load_extension('fzf')
+require('telescope').load_extension('live_grep_args')
+require('telescope').load_extension('file_browser')
 
 -- Better quickfix
 require('bqf.config').preview.winblend = 0
@@ -72,7 +58,7 @@ require('bqf.config').preview.winblend = 0
 -- Treesitter (highlighting)
 require 'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+  ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
@@ -83,11 +69,55 @@ require 'nvim-treesitter.configs'.setup {
 
   highlight = {
     enable = true,
+    disable = function(_, buf)
+      local max_filesize = 1024 * 1024 -- 1MiB
+      local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
     additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = false,
   },
 }
 
-local lsp_zero = require('lsp-zero')
+vim.api.nvim_create_autocmd({ "InsertEnter" },
+  {
+    pattern = "*",
+    callback = function()
+      if vim.api.nvim_buf_line_count(0) > 4000 then
+        vim.cmd("TSDisable highlight")
+      end
+    end
+  })
+
+vim.api.nvim_create_autocmd({ "InsertLeave" },
+  {
+    pattern = "*",
+    callback = function()
+      if vim.api.nvim_buf_line_count(0) > 4000 then
+        vim.cmd("TSEnable highlight")
+      end
+    end
+  })
+
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+  callback = function()
+    vim.cmd("TSEnable highlight")
+  end
+})
+
+pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    local arg = vim.fn.argv(0)
+    if #arg == 1 and vim.fn.isdirectory(vim.fn.expand(arg)) ~= 0 then
+      require("telescope").extensions.file_browser.file_browser()
+    end
+  end,
+})
 
 -- lsp_attach is where you enable features that only work
 -- if there is a language server active in the file
@@ -115,12 +145,11 @@ local lsp_attach = function(client, bufnr)
     { buffer = bufnr, desc = "Set quickfix list" })
 end
 
-lsp_zero.extend_lspconfig({
+require('lsp-zero').extend_lspconfig({
   sign_text = true,
   lsp_attach = lsp_attach,
   capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
-
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
@@ -133,7 +162,7 @@ require('mason-lspconfig').setup({
 
 require('lspconfig').lua_ls.setup({
   on_init = function(client)
-    lsp_zero.nvim_lua_settings(client, {})
+    require('lsp-zero').nvim_lua_settings(client, {})
   end,
 })
 
@@ -144,6 +173,7 @@ require("lspconfig").clangd.setup {
     "--fallback-style=llvm"
   }
 }
+
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
@@ -221,10 +251,10 @@ cmp.setup({
 
       local sig_mult = .8
       if sig ~= nil then
-        if #sig > math.floor(max_content_width*sig_mult) then
-          item.menu = vim.fn.strcharpart(sig, 0, math.floor(max_content_width*sig_mult) - 3) .. "..."
+        if #sig > math.floor(max_content_width * sig_mult) then
+          item.menu = vim.fn.strcharpart(sig, 0, math.floor(max_content_width * sig_mult) - 3) .. "..."
         else
-          item.menu = sig .. (" "):rep(math.floor(max_content_width*sig_mult) - #sig)
+          item.menu = sig .. (" "):rep(math.floor(max_content_width * sig_mult) - #sig)
         end
       end
       return item
@@ -282,40 +312,9 @@ cmp.setup.cmdline(':', {
   })
 })
 
-local harpoon = require("harpoon")
 
--- REQUIRED
-harpoon:setup()
--- REQUIRED
-
-vim.keymap.set("n", "<leader>m", function() harpoon:list():add() end, { desc = "Add to harpoon list" })
-vim.keymap.set("n", "<leader>`", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
-  { desc = "Show harpoon list" })
-
-vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Go to 1. harpoon list entry" })
-vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Go to 2. harpoon list entry" })
-vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Go to 3. harpoon list entry" })
-vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Go to 4. harpoon list entry" })
-vim.keymap.set("n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Go to 5. harpoon list entry" })
-vim.keymap.set("n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Go to 1. harpoon list entry" })
-vim.keymap.set("n", "<leader>7", function() harpoon:list():select(7) end, { desc = "Go to 2. harpoon list entry" })
-vim.keymap.set("n", "<leader>8", function() harpoon:list():select(8) end, { desc = "Go to 3. harpoon list entry" })
-vim.keymap.set("n", "<leader>9", function() harpoon:list():select(9) end, { desc = "Go to 4. harpoon list entry" })
-vim.keymap.set("n", "<leader>0", function() harpoon:list():select(10) end, { desc = "Go to 5. harpoon list entry" })
-
--- Toggle previous & next buffers stored within Harpoon list
-vim.keymap.set("n", "<leader>n", function() harpoon:list():prev() end, { desc = "Go to next harpoon list entry" })
-vim.keymap.set("n", "<leader>N", function() harpoon:list():next() end, { desc = "Go to previous harpoon list entry" })
-
-pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    if vim.fn.isdirectory(vim.fn.expand(vim.fn.argv(0))) ~= 0 then
-      require("telescope").extensions.file_browser.file_browser()
-    end
-  end,
-})
-
--- Activity watcher
-
+-- project navigation
+require("harpoon"):setup()
+-- smooth scrolling
+require("cinnamon").setup()
 

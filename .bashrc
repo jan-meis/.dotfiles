@@ -122,4 +122,3 @@ tmux::send_keys_all() {
         done
     done
   }
-
