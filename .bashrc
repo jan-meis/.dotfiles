@@ -13,6 +13,7 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
 export EDITOR=nvim
+export GPG_TTY=$(tty)
 
 
 # HISTORY SETTINGS
@@ -122,3 +123,4 @@ tmux::send_keys_all() {
         done
     done
   }
+

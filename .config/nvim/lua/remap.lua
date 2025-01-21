@@ -81,11 +81,20 @@ local function count_visual()
 end
 
 -- Telescope
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = "Find files" })
+local tb = require('telescope.builtin')
+local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
+vim.keymap.set("n", "<leader>gc", live_grep_args_shortcuts.grep_word_under_cursor)
+
+vim.keymap.set('n', '<leader>ff', tb.find_files, { desc = "Find files" })
+
+vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_cursor, { desc = "Find word under cursor" })
+vim.keymap.set('v', '<leader>fg', live_grep_args_shortcuts.grep_visual_selection, { desc = "Find word in visual selection" })
+vim.keymap.set('n', '<leader>fW', live_grep_args_shortcuts.grep_word_under_cursor_current_buffer, { desc = "Find word under cursor in current buffer" })
+vim.keymap.set('v', '<leader>fG', live_grep_args_shortcuts.grep_word_visual_selection_current_buffer, { desc = "Find word in visual selection in current buffer" })
+
 vim.keymap.set('n', '<leader>fg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = "Grep files" })
-vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = "Find in buffers" })
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = "Find help" })
+vim.keymap.set('n', '<leader>l', tb.buffers, { desc = "Find in buffers" })
+vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = "Find help" })
 vim.keymap.set('n', '<leader>fc',
   function()
     require("telescope.builtin").current_buffer_fuzzy_find({ fuzzy = false, case_mode = "ignore_case" })

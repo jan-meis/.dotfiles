@@ -1,4 +1,3 @@
-
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -21,14 +20,28 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "100"
-vim.filetype.add({ extension = { gmk = "make" } })
+vim.opt.colorcolumn = "140"
+vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
 
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
 
 -- Telescope (fuzzy finder)
 require("telescope").setup {
+  defaults = {
+    layout_config = {
+      width = { padding = 1 }
+    } ,
+    mappings = {
+      i = {
+        -- map actions.which_key to <C-h> (default: <C-/>)
+        -- actions.which_key shows the mappings for your picker,
+        -- e.g. git_{create, delete, ...}_branch for the git_branches picker
+        ["<C-h>"] = "which_key",
+        ["<c-d>"] = "delete_buffer",
+      }
+    }
+  },
   extensions = {
     file_browser = {
       hidden = { file_browser = true, folder_browser = true },
@@ -39,9 +52,17 @@ require("telescope").setup {
       mappings = {         -- extend mappings
         i = {
           ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
-          ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix = " --iglob " }),
+          ["<C-g>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix = " --iglob " }),
+          ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix =
+          " --iglob krn/si/ic/*.{c,cpp,h} \z
+            --iglob krn/si/ic/include/*.{h} \z
+            --iglob krn/si/include/{ic}*.{h} \z
+            --iglob krn/ict/*.{c,cpp,h} \z
+            --iglob krn/include/{ic}*.{h} \z
+            --iglob base/ni/*.{c,cpp,h} \z
+            --iglob include/{ni,si,ic}*.{h}" }),
           -- freeze the current list and start a fuzzy search in the frozen list
-          ["<C-Space>"] = require("telescope.actions").to_fuzzy_refine,
+          ["<C-Space>"] = require("telescope-live-grep-args.actions").to_fuzzy_refine,
         },
       },
     }
@@ -119,6 +140,8 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end,
 })
 
+AllowGlobalFormat = false
+
 -- lsp_attach is where you enable features that only work
 -- if there is a language server active in the file
 local lsp_attach = function(client, bufnr)
@@ -132,7 +155,16 @@ local lsp_attach = function(client, bufnr)
     { buffer = bufnr, desc = "Show occurrences of this object" })
   vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', { buffer = bufnr, desc = "Signature help" })
   vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', { buffer = bufnr, desc = "Rename in buffer" })
-  vim.keymap.set({ 'n', 'x', 'v' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
+  vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
+    function()
+      if vim.api.nvim_get_mode().mode == 'n' then
+        if AllowGlobalFormat then
+          vim.lsp.buf.format({ async = true })
+        end
+      else
+        vim.lsp.buf.format({ async = true })
+      end
+    end,
     { buffer = bufnr, desc = "Format buffer" })
   vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', { buffer = bufnr, desc = "Apply suggested fix" })
   vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>',
@@ -170,7 +202,8 @@ require("lspconfig").clangd.setup {
   cmd = {
     "clangd",
     "--enable-config",
-    "--fallback-style=llvm"
+    "--fallback-style=llvm",
+    "--header-insertion=never"
   }
 }
 
@@ -317,4 +350,3 @@ cmp.setup.cmdline(':', {
 require("harpoon"):setup()
 -- smooth scrolling
 require("cinnamon").setup()
-
