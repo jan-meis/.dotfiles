@@ -86,6 +86,7 @@ local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
 vim.keymap.set("n", "<leader>gc", live_grep_args_shortcuts.grep_word_under_cursor)
 
 vim.keymap.set('n', '<leader>ff', tb.find_files, { desc = "Find files" })
+vim.keymap.set('n', '<leader>fr', tb.resume, { desc = "Resume telescope search" })
 
 vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_cursor, { desc = "Find word under cursor" })
 vim.keymap.set('v', '<leader>fg', live_grep_args_shortcuts.grep_visual_selection, { desc = "Find word in visual selection" })
@@ -124,6 +125,10 @@ vim.keymap.set({ "n", "v" }, "<leader>zz", count_visual, { desc = "tmp" })
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection up" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("n", "J", "mzJ`z")
+
+vim.keymap.set("n", "<leader>gs", ":! git add . && git commit -m 'sync' && git push ld5587<CR>",
+  { desc = "sync git with ld5587" })
+vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR><C-w>k:q", { desc = "sync git with ld5587" })
 
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
@@ -170,4 +175,4 @@ vim.keymap.set("n", "<leader>n", function() harpoon:list():prev() end, { desc = 
 vim.keymap.set("n", "<leader>N", function() harpoon:list():next() end, { desc = "Go to previous harpoon list entry" })
 
 -- vim.opt.langmap = "-/_?#*'#"
-vim.opt.langmap = "-/_?ö{Ö[ä}Ä]"
+vim.opt.langmap = "-/_?ö{Ö[ä}Ä]<-"

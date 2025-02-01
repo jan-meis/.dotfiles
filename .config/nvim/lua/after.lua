@@ -1,10 +1,12 @@
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
+vim.opt.tabstop = 8
+vim.opt.softtabstop = 8
+vim.opt.shiftwidth = 8
+vim.opt.expandtab = false
+vim.opt.list = true
+vim.opt.listchars = "tab:>-"
 vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
@@ -27,6 +29,8 @@ vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
 
 -- Telescope (fuzzy finder)
+local lga_actions = require("telescope-live-grep-args.actions")
+local actions = require("telescope.actions")
 require("telescope").setup {
   defaults = {
     layout_config = {
@@ -38,7 +42,48 @@ require("telescope").setup {
         -- actions.which_key shows the mappings for your picker,
         -- e.g. git_{create, delete, ...}_branch for the git_branches picker
         ["<C-h>"] = "which_key",
-        ["<c-d>"] = "delete_buffer",
+		-- This replaces nvim_buf_delete with vim.cmd("bd ") to avoid global marks being deleted
+		["<c-d>"] = function(prompt_bufnr)
+            local action_state = require "telescope.actions.state"
+			local current_picker = action_state.get_current_picker(prompt_bufnr)
+
+			current_picker:delete_selection(function(selection)
+				local force = vim.api.nvim_buf_get_option(selection.bufnr, "buftype") == "terminal"
+				local ok = pcall(function() vim.cmd("bd " .. selection.bufnr) end)
+
+				-- If the current buffer is deleted, switch to the previous buffer
+				-- according to bdelete behavior
+				if ok and selection.bufnr == current_picker.original_bufnr then
+					if vim.api.nvim_win_is_valid(current_picker.original_win_id) then
+						local jumplist = vim.fn.getjumplist(current_picker.original_win_id)[1]
+						for i = #jumplist, 1, -1 do
+							if jumplist[i].bufnr ~= selection.bufnr and vim.fn.bufloaded(jumplist[i].bufnr) == 1 then
+								vim.api.nvim_win_set_buf(current_picker.original_win_id, jumplist[i].bufnr)
+								current_picker.original_bufnr = jumplist[i].bufnr
+								return ok
+							end
+						end
+        -- no more valid buffers in jumplist, create an empty buffer
+        local empty_buf = vim.api.nvim_create_buf(true, true)
+        vim.api.nvim_win_set_buf(current_picker.original_win_id, empty_buf)
+        current_picker.original_bufnr = empty_buf
+        vim.api.nvim_buf_delete(selection.bufnr, { force = true })
+        return ok
+      end
+
+      -- window of the selected buffer got wiped, switch to first valid window
+      local win_id = vim.fn.win_getid(1, current_picker.original_tabpage)
+      current_picker.original_win_id = win_id
+      current_picker.original_bufnr = vim.api.nvim_win_get_buf(win_id)
+    end
+    return ok
+  end)
+end
+
+
+
+
+		,
       }
     }
   },
@@ -51,9 +96,9 @@ require("telescope").setup {
       -- define mappings, e.g.
       mappings = {         -- extend mappings
         i = {
-          ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
-          ["<C-g>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix = " --iglob " }),
-          ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix =
+          ["<C-k>"] = lga_actions.quote_prompt(),
+          ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+          ["<C-i>"] = lga_actions.quote_prompt({ postfix =
           " --iglob krn/si/ic/*.{c,cpp,h} \z
             --iglob krn/si/ic/include/*.{h} \z
             --iglob krn/si/include/{ic}*.{h} \z
@@ -62,7 +107,7 @@ require("telescope").setup {
             --iglob base/ni/*.{c,cpp,h} \z
             --iglob include/{ni,si,ic}*.{h}" }),
           -- freeze the current list and start a fuzzy search in the frozen list
-          ["<C-Space>"] = require("telescope-live-grep-args.actions").to_fuzzy_refine,
+          ["<C-Space>"] = actions.to_fuzzy_refine,
         },
       },
     }
