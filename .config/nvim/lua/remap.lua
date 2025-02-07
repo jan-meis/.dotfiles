@@ -80,6 +80,22 @@ local function count_visual()
   vim.fn.setreg("l", len)
 end
 
+vim.keymap.set("i", "<Tab>","<C-v><Tab>" , { desc = "Tab" })
+vim.keymap.set("n", "<leader>ht", function() vim.cmd("set list!") end, { desc = "Toggle tab visibility" })
+vim.keymap.set("n", "<leader>sc", function()
+	vim.cmd("! mv ~/compile_commands.json.old ~/compile_commands.json.old.tmp &&" ..
+		"mv /priv/i749707/bas/CGK/src/compile_commands.json ~/compile_commands.json.old &&" ..
+		"mv ~/compile_commands.json.old.tmp /priv/i749707/bas/CGK/src/compile_commands.json")
+end, { desc = "Toggle tab visibility" })
+vim.keymap.set("n", "<leader>c+", function()
+        ContextMaxHeight = ContextMaxHeight + 1
+        require 'treesitter-context'.setup { max_lines = ContextMaxHeight, trim_scope = 'inner' }
+end, { desc = "Increase context line height" })
+vim.keymap.set("n", "<leader>c-", function()
+        ContextMaxHeight = ContextMaxHeight - 1
+        require 'treesitter-context'.setup { max_lines = ContextMaxHeight, trim_scope = 'inner' }
+end, { desc = "Increase context line height" })
+
 -- Telescope
 local tb = require('telescope.builtin')
 local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
@@ -94,7 +110,8 @@ vim.keymap.set('n', '<leader>fW', live_grep_args_shortcuts.grep_word_under_curso
 vim.keymap.set('v', '<leader>fG', live_grep_args_shortcuts.grep_word_visual_selection_current_buffer, { desc = "Find word in visual selection in current buffer" })
 
 vim.keymap.set('n', '<leader>fg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = "Grep files" })
-vim.keymap.set('n', '<leader>l', tb.buffers, { desc = "Find in buffers" })
+vim.keymap.set('n', '<leader>l', function() tb.buffers({ sort_mru = true }) end, { desc = "Find in buffers" })
+vim.keymap.set('n', '<leader>fl', tb.oldfiles, { desc = "Previously opened files" })
 vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = "Find help" })
 vim.keymap.set('n', '<leader>fc',
   function()

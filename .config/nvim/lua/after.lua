@@ -4,7 +4,8 @@ vim.opt.relativenumber = true
 vim.opt.tabstop = 8
 vim.opt.softtabstop = 8
 vim.opt.shiftwidth = 8
-vim.opt.expandtab = false
+vim.opt.cmdheight = 0
+vim.opt.expandtab = true
 vim.opt.list = true
 vim.opt.listchars = "tab:>-"
 vim.opt.smartindent = true
@@ -27,6 +28,12 @@ vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "
 
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
+require('lualine').setup()
+ContextMaxHeight = 1
+require'treesitter-context'.setup{
+  max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
+  trim_scope = 'inner'
+}
 
 -- Telescope (fuzzy finder)
 local lga_actions = require("telescope-live-grep-args.actions")

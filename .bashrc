@@ -116,6 +116,14 @@ if ! shopt -oq posix; then
   fi
 fi
 
+function swap()         
+{
+    local TMPFILE=tmp.$$
+    mv "$1" $TMPFILE
+    mv "$2" "$1"
+    mv $TMPFILE "$2"
+}
+
 tmux::send_keys_all() {
     for _window in $(tmux list-windows -F '#I'); do
         for _pane in $(tmux list-panes -t ${_window} -F '#P'); do

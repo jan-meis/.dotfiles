@@ -33,6 +33,7 @@ Spec = {
   -- add your plugins here
   { 'rebelot/kanagawa.nvim' },
   { "nvim-treesitter/nvim-treesitter",  build = ":TSUpdate" },
+  { "nvim-treesitter/nvim-treesitter-context" },
   { "mbbill/undotree" },
   { "tpope/vim-fugitive" },
   { 'VonHeikemen/lsp-zero.nvim',        branch = 'v4.x' },
@@ -95,15 +96,16 @@ Spec = {
   { "davvid/harpoon",        branch = "save-cursor-position", dependencies = { "nvim-lua/plenary.nvim" } },
   { "lambdalisue/vim-suda" },
   { "declancm/cinnamon.nvim" },
+  { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
   {
     'rmagatti/auto-session',
     lazy = false,
-
     ---enables autocomplete for opts
     ---@module "auto-session"
     ---@type AutoSession.Config
     opts = {
       suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+      use_git_branch = true,
       -- log_level = 'debug',
     }
   }
