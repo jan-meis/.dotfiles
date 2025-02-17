@@ -15,19 +15,16 @@ export LANGUAGE=en_US.UTF-8
 export EDITOR=nvim
 export GPG_TTY=$(tty)
 
-
 # HISTORY SETTINGS
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-# append to the history file, don't overwrite it
-shopt -s histappend
-# avoid duplicates..
-export HISTCONTROL=ignoredups:erasedups
-# After each command, save and reload history
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTFILE=$HOME/.bash_history_file
 HISTSIZE=10000
 HISTFILESIZE=20000
+# avoid duplicates..
+export HISTCONTROL=ignoredups:erasedups  
+# append history entries..
+shopt -s histappend
+# After each command, save and reload history
+export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -131,4 +128,3 @@ tmux::send_keys_all() {
         done
     done
   }
-
