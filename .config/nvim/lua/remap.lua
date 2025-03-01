@@ -143,8 +143,8 @@ vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection up" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("n", "J", "mzJ`z")
 
-vim.keymap.set("n", "<leader>gs", ":! git add . && git commit -m 'sync' && git push ld5587<CR>",
-  { desc = "sync git with ld5587" })
+vim.keymap.set("n", "<leader>gs", ":! git add . && git commit -m 'sync' && git push ccde<CR>",
+  { desc = "sync git with ccde" })
 vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR><C-w>k:q", { desc = "sync git with ld5587" })
 
 vim.keymap.set("n", "n", "nzzzv")

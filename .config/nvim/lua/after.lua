@@ -12,6 +12,7 @@ vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
+vim.opt.ignorecase = true
 if (os.getenv("UNDODIR") ~= nil) then
   vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
 else
@@ -28,7 +29,9 @@ vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "
 
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
-require('lualine').setup()
+require('lualine').setup({
+        sections = { lualine_c = { { 'filename', path = 1 } } }
+})
 ContextMaxHeight = 1
 require'treesitter-context'.setup{
   max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
@@ -255,7 +258,8 @@ require("lspconfig").clangd.setup {
     "clangd",
     "--enable-config",
     "--fallback-style=llvm",
-    "--header-insertion=never"
+    "--header-insertion=never",
+    "--offset-encoding=utf-16"
   }
 }
 

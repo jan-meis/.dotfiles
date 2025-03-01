@@ -13,7 +13,6 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
 export EDITOR=nvim
-export GPG_TTY=$(tty)
 
 # HISTORY SETTINGS
 HISTFILE=$HOME/.bash_history_file
@@ -127,4 +126,5 @@ tmux::send_keys_all() {
             tmux send-keys -t ${_window}.${_pane} "$@"
         done
     done
-  }
+}
+
