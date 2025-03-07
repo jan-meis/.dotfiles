@@ -50,11 +50,27 @@ local function getCurrentTest()
 end
 
 local function getFilePathAndLineNumber()
-  local ret = vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
+  return vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
+end
+
+local function copyFilePathAndLineNumber()
+  local ret = getFilePathAndLineNumber()
+  vim.fn.setreg("+", ret)
+  print(string.format("Copied %s to clipboard", ret))
+end
+
+local function setFilePathAndLineNumber()
+  local ret = getFilePathAndLineNumber()
   vim.fn.setreg("+", ret)
   vim.cmd('silent !tmux setenv -g CURRENT_BREAKPOINT ' .. ret)
   vim.cmd('silent !tmux send-keys -t 1 "export CURRENT_BREAKPOINT=' .. ret .. '" C-m')
   print(string.format("Set $CURRENT_BREAKPOINT to %s.", ret))
+end
+
+local function copyLineNumber()
+  local ret = vim.fn.getcurpos()[2]
+  vim.fn.setreg("+", ret)
+  print(string.format("Copied %s to clipboard", ret))
 end
 
 local function openGDB()
@@ -121,7 +137,9 @@ vim.keymap.set('n', '<leader>fc',
   { desc = "Find in current buffer" })
 
 
-vim.keymap.set("n", "<leader>sb", getFilePathAndLineNumber, { desc = "Copy line number and file path" })
+vim.keymap.set("n", "<leader>sb", setFilePathAndLineNumber, { desc = "Set line number and file path" })
+vim.keymap.set("n", "<leader>cb", copyFilePathAndLineNumber, { desc = "Copy line number and file path" })
+vim.keymap.set("n", "<leader>cn", copyLineNumber, { desc = "Copy line number" })
 vim.keymap.set("n", "<leader>st", getCurrentTest, { desc = "Copy test name" })
 vim.keymap.set("n", "<leader>db", openGDB, { desc = "open GDB in new tmux pane" })
 
