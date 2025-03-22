@@ -128,3 +128,5 @@ tmux::send_keys_all() {
     done
 }
 
+get_tmux_var () { tmux show-environment $1 | sed "s:^.*=::"; }
+

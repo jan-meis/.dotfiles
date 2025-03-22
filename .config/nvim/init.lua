@@ -30,20 +30,41 @@ end
 
 -- Setup lazy.nvim
 Spec = {
-  -- add your plugins here
+  -- pretty colors
   { 'rebelot/kanagawa.nvim' },
+  -- fast highlighting
   { "nvim-treesitter/nvim-treesitter",  build = ":TSUpdate" },
+  {
+      'fei6409/log-highlight.nvim',
+      config = function()
+          require('log-highlight').setup {
+                pattern = {
+                    '/var/log/.*',
+                    'messages%..*',
+                    'dev_.*'
+                },
+          }
+      end,
+  },
+  -- show what function you are in 
   { "nvim-treesitter/nvim-treesitter-context" },
+  -- undo forever
   { "mbbill/undotree" },
+  -- git
   { "tpope/vim-fugitive" },
+  -- LSP auto setup
   { 'VonHeikemen/lsp-zero.nvim',        branch = 'v4.x' },
   { 'williamboman/mason.nvim' },
   { 'williamboman/mason-lspconfig.nvim' },
   { 'neovim/nvim-lspconfig' },
+  -- DAP (debug adapter protocol)
+  { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
+  -- autocomplete
   { 'hrsh7th/cmp-nvim-lsp' },
   { 'hrsh7th/nvim-cmp' },
   { 'hrsh7th/cmp-cmdline' },
   { 'hrsh7th/cmp-path' },
+  -- live grep
   {
     'nvim-telescope/telescope.nvim',
     tag = '0.1.8',
@@ -74,7 +95,9 @@ Spec = {
       }
     end,
   },
+  -- prettiier quickfix list
   { 'kevinhwang91/nvim-bqf', ft = 'qf' },
+  -- key help
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -93,10 +116,15 @@ Spec = {
       },
     },
   },
+  -- better global marks
   { "davvid/harpoon",        branch = "save-cursor-position", dependencies = { "nvim-lua/plenary.nvim" } },
+  -- write with sudo
   { "lambdalisue/vim-suda" },
+  -- prettier movement animation
   { "declancm/cinnamon.nvim" },
+  -- prttier status line
   { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
+  -- save last opened file
   {
     'rmagatti/auto-session',
     lazy = false,
@@ -128,11 +156,11 @@ require("after")
 require("remap")
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_after.lua")) then
-  require("machine_specific_includes")
+  require("machine_specific_after")
 end
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_remap.lua")) then
-  require("machine_specific_includes")
+  require("machine_specific_remap")
 end
 
 require("tmp")

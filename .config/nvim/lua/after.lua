@@ -2,8 +2,8 @@ vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 8
-vim.opt.softtabstop = 8
-vim.opt.shiftwidth = 8
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.cmdheight = 0
 vim.opt.expandtab = true
 vim.opt.list = true
@@ -18,6 +18,15 @@ if (os.getenv("UNDODIR") ~= nil) then
 else
   vim.opt.undodir = os.getenv("HOME") .. "/.local/nvim/undodir"
 end
+Mysrcpath = os.getenv("HOME") .. "/src"
+Mybuildpath = os.getenv("HOME") .. "/build"
+if (os.getenv("mysrcpath") ~= nil) then
+  Mysrcpath = os.getenv("mysrcpath")
+end
+if (os.getenv("mybuildpath") ~= nil) then
+  Mybuildpath = os.getenv("mybuildpath")
+end
+
 vim.opt.undofile = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
@@ -26,11 +35,32 @@ vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "140"
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
+vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
+
+local function selectionCount()
+    local isVisualMode = vim.fn.mode():find("[Vv]")
+    if not isVisualMode then return "" end
+    local starts = vim.fn.line("v")
+    local ends = vim.fn.line(".")
+    local lines = starts <= ends and ends - starts + 1 or starts - ends + 1
+    return "/ " .. tostring(lines) .. "L " .. tostring(vim.fn.wordcount().visual_chars) .. "C"
+end
+local function isRecording ()
+  local reg = vim.fn.reg_recording()
+  if reg == "" then return "" end -- not recording
+  return "recording to " .. reg
+end
 require('lualine').setup({
-        sections = { lualine_c = { { 'filename', path = 1 } } }
+
+    sections = {
+        lualine_c = { { 'filename', path = 1 }, { isRecording } },
+        lualine_z = { "location",
+            { selectionCount },
+        },
+    }
 })
 ContextMaxHeight = 1
 require'treesitter-context'.setup{
@@ -263,6 +293,29 @@ require("lspconfig").clangd.setup {
   }
 }
 
+local dap = require("dap")
+dap.adapters.gdb = {
+  type = "executable",
+  command = "gdb",
+  args = { "--interpreter=dap", "--eval-command", "set print pretty on"  }
+}
+dap.configurations.cpp = {
+  {
+    name = "Launch",
+    type = "gdb",
+    request = "launch",
+    program = function()
+      return vim.fn.input('Path to executable: ', Mybuildpath, "file")
+    end,
+    args = function()
+      return vim.fn.input('Select filter for test: ', '--gtest_filter=')
+    end,
+    cwd = Mybuildpath,
+    stopAtBeginningOfMainSubprogram = false
+  }
+}
+
+require("dapui").setup()
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
