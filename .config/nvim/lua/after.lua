@@ -13,6 +13,9 @@ vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.ignorecase = true
+
+vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
+vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q") | !echo -ne "\033]12;#C8C093\007"')
 if (os.getenv("UNDODIR") ~= nil) then
   vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
 else
@@ -459,3 +462,6 @@ cmp.setup.cmdline(':', {
 require("harpoon"):setup()
 -- smooth scrolling
 require("cinnamon").setup()
+
+-- This has to go here because soem plugin overwrites it
+vim.cmd("highlight Cursor gui=NONE guifg=bg guibg=#C8C093")
