@@ -257,9 +257,13 @@ local lsp_attach = function(client, bufnr)
   vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', { buffer = bufnr, desc = "Apply suggested fix" })
   vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>',
     { buffer = bufnr, desc = "Open diagnostic" })
-  vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next()<cr>',
+  vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>',
     { buffer = bufnr, desc = "Go to next diagnostic" })
-  vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev()<cr>',
+  vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>',
+    { buffer = bufnr, desc = "Go to previous diagnositc" })
+  vim.keymap.set('n', '<leader>gN', '<cmd>lua vim.diagnostic.goto_next()<cr>',
+    { buffer = bufnr, desc = "Go to next diagnostic" })
+  vim.keymap.set('n', '<leader>gP', '<cmd>lua vim.diagnostic.goto_prev()<cr>',
     { buffer = bufnr, desc = "Go to previous diagnositc" })
   vim.keymap.set('n', '<leader>sqf', '<cmd>lua vim.diagnostic.setqflist()<cr>',
     { buffer = bufnr, desc = "Set quickfix list" })

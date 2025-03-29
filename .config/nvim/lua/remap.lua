@@ -1,5 +1,5 @@
 -- coping with a german keyboard
-vim.opt.langmap = "-/_?ö{Ö[ä}Ä]<-"
+vim.opt.langmap = "-/_?ö{Ö[ä}Ä]"
 vim.keymap.set({ "i" }, "ö", "{")
 vim.keymap.set({ "i" }, "ä", "}")
 vim.keymap.set({ "i" }, "Ö", "[")

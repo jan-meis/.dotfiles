@@ -42,8 +42,8 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+case "$TERM" in xterm-color|*-256color)
+    color_prompt=yes;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -64,6 +64,8 @@ fi
 
 if [ "$color_prompt" = yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    printf "\e[?12h"             # turn on cursor blinking
+    printf "\033]12;#C8C093\007" # reset the color
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
