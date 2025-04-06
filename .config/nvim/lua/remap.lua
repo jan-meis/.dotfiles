@@ -27,6 +27,34 @@ vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete to void regi
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 
+-- LSP bindings
+vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', {  desc = "Show documentation" })
+vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
+vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
+vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', { desc = "Go to implementation" })
+vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
+vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', { desc = "Show occurrences of this object" })
+vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', { desc = "Signature help" })
+vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = "Rename in buffer" })
+vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
+  function()
+    if vim.api.nvim_get_mode().mode == 'n' then
+      if AllowGlobalFormat then
+        vim.lsp.buf.format({ async = true })
+      end
+    else
+      vim.lsp.buf.format({ async = true })
+    end
+  end,
+  { desc = "Format buffer" })
+vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = "Apply suggested fix" })
+vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>', { desc = "Open diagnostic" })
+vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to previous diagnositc" })
+vim.keymap.set('n', '<leader>gN', '<cmd>lua vim.diagnostic.goto_next()<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '<leader>gP', '<cmd>lua vim.diagnostic.goto_prev()<cr>', { desc = "Go to previous diagnositc" })
+vim.keymap.set('n', '<leader>sqf', '<cmd>lua vim.diagnostic.setqflist()<cr>', { desc = "Set quickfix list" })
+
 -- nvim-bqf (better quickfix list)
 local function toggleQuickfix()
   local qfopen = false
@@ -99,32 +127,35 @@ vim.keymap.set("n", "<leader>cn", copyLineNumber, { desc = "Copy line number" })
 
 -- Github Copilot settings
 vim.g.copilot_no_tab_map = true
-vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  replace_keycodes = false
-})
-vim.keymap.set({ 'n', 'i' }, '<F12>',
+vim.keymap.set({ 'n', 'i' }, '<C-F7>',
   function()
-    vim.cmd("Copilot enable")
-    print("Copilot enabled")
-  end, { desc = "Enable Copilot" })
-vim.keymap.set({ 'n', 'i' }, '<C-F12>',
-  function()
+      if (not GithubCopilotEnabled) then
+          vim.cmd("Copilot enable")
+          print("Copilot enabled")
+          GithubCopilotEnabled = true
+      else
+          vim.cmd("Copilot disable")
+          print("Copilot disabled")
+          GithubCopilotEnabled = false
+      end
     vim.cmd("Copilot disable")
-    print("Copilot disabled")
-  end, { desc = "Disable Copilot" })
+  end, { desc = "Copilot toggle" })
 vim.keymap.set('i', '<F8>', '<Plug>(copilot-suggest)', { desc = "Suggest copilot completion" })
-vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  replace_keycodes = false,
-  desc = "Accept copilot completion"
-})
-vim.keymap.set('i', '<C-F9>', '<Plug>(copilot-next)', { desc = "Next copilot suggestion" })
+vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false, desc = "Accept copilot completion" })
+vim.keymap.set({'n'}, '<F7>', ':CopilotChatToggle<CR>', { desc = "Toggle Copilot Chat" })
 vim.keymap.set('i', '<C-F8>', '<Plug>(copilot-previous)', { desc = "Previous copilot suggestion" })
-vim.keymap.set('i', '<F12>', '<Plug>(copilot-dismiss)', { desc = "Dismiss copilot suggestion" })
+vim.keymap.set('i', '<M-F8>', '<Plug>(copilot-dismiss)', { desc = "Dismiss copilot suggestion" })
+vim.keymap.set('i', '<C-F9>', '<Plug>(copilot-next)', { desc = "Next copilot suggestion" })
 vim.keymap.set('i', '<M-F9>', '<Plug>(copilot-accept-word)', { desc = "Accept copilot word" })
 vim.keymap.set('i', '<M-C-F9>', '<Plug>(copilot-accept-line)', { desc = "Accept copilot line" })
-vim.keymap.set({'n'}, '<F7>', ':CopilotChatToggle<CR>', { desc = "Toggle Copilot Chat" })
+
+-- Dap settings
+vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
+vim.keymap.set({ "n" }, "<leader><F5>", require("dapui").toggle, { desc = "Open DAP UI" })
+vim.keymap.set({ 'n', 'i' }, '<F5>', function() require('dap').continue() end, { desc = "DAP continue" })
+vim.keymap.set({ 'n', 'i' }, '<F10>', function() require('dap').step_over() end, { desc = "DAP step over" })
+vim.keymap.set({ 'n', 'i' }, '<C-F11>', function() require('dap').step_into() end, { desc = "DAP step into" })
+vim.keymap.set({ 'n', 'i' }, '<F12>', function() require('dap').step_out() end, { desc = "DAP step out" })
 
 -- treesitter-context (show function signature in top row)
 vim.keymap.set("n", "<leader>gu", function() require("treesitter-context").go_to_context(vim.v.count1) end, { silent = true, desc = "Go to function signature" })
@@ -156,14 +187,6 @@ vim.keymap.set('n', '<leader>fc',
     vim.cmd("TSEnable highlight")
   end,
   { desc = "Find in current buffer" })
-
--- Dap settings
-vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
-vim.keymap.set({ "n" }, "<leader><F5>", require("dapui").toggle, { desc = "Open DAP UI" })
-vim.keymap.set({ 'n', 'i' }, '<F5>', function() require('dap').continue() end, { desc = "DAP continue" })
-vim.keymap.set({ 'n', 'i' }, '<F10>', function() require('dap').step_over() end, { desc = "DAP step over" })
-vim.keymap.set({ 'n', 'i' }, '<C-F11>', function() require('dap').step_into() end, { desc = "DAP step into" })
-vim.keymap.set({ 'n', 'i' }, '<F12>', function() require('dap').step_out() end, { desc = "DAP step out" })
 
 -- undoTree
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
