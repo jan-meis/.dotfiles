@@ -1,13 +1,67 @@
--- coping with a german keyboard
-vim.opt.langmap = "-/_?ö{Ö[ä}Ä]"
+-- coping with a German keyboard
+vim.opt.langmap = "-/_?ö[Ö{ä]Ä}"
 vim.keymap.set({ "i" }, "ö", "{")
 vim.keymap.set({ "i" }, "ä", "}")
 vim.keymap.set({ "i" }, "Ö", "[")
 vim.keymap.set({ "i" }, "Ä", "]")
 vim.keymap.set({ "i" }, "ß", "\\")
 vim.keymap.set({ "n" }, "<leader>ö", "o{<CR>}<Esc>O")
+vim.keymap.set("n", "<C-a>", "<C-]>")
+vim.keymap.set("n", "öa", ":previous<CR>")
+vim.keymap.set("n", "öA", ":rewind<CR>")
+vim.keymap.set("n", "öb", ":bprevious<CR>")
+vim.keymap.set("n", "öB", ":brewind<CR>")
+vim.keymap.set("n", "öd", "<cmd>lua vim.diagnostic.jump({count=-1})<cr>", {desc = "Jump to the previous diagnostic in the current buffer"})
+vim.keymap.set("n", "öD", "<cmd>lua vim.diagnostic.jump({count=-1000})<cr>", {desc = "Jump to the first diagnostic in the current buffer"})
+vim.keymap.set("n", "öl", ":lprevious<CR>")
+vim.keymap.set("n", "öL", ":lrewind<CR>")
+vim.keymap.set("n", "öm", "[m", { desc = "Previous method start"})
+vim.keymap.set("n", "öM", "[M", { desc = "Previous method end"})
+vim.keymap.set("n", "öq", ":cprevious<CR>")
+vim.keymap.set("n", "öQ", ":crewind<CR>")
+vim.keymap.set("n", "ös", "[s", { desc = "Previous misspelled word"} )
+vim.keymap.set("n", "öt", ":tprevious<CR>")
+vim.keymap.set("n", "öT", ":trewind<CR>")
+vim.keymap.set("n", "ö%", "<Plug>(MatchitNormalMultiBackward)", {desc = "Previous unmatched group"})
+vim.keymap.set("x", "ö%", "<Plug>(MatchitVisualMultiBackward)")
+vim.keymap.set("o", "ö%", "<Plug>(MatchitOperationMultiBackward)")
+vim.keymap.set("n", "ö(", "[(")
+vim.keymap.set("n", "ö<", "[<")
+vim.keymap.set("n", "öÖ", "[{")
+vim.keymap.set("n", "öö", "[[")
+vim.keymap.set("n", "ö<C-L>", ":lpfile<CR>")
+vim.keymap.set("n", "ö<C-Q>", ":cpfile<CR>")
+vim.keymap.set("n", "ö<C-T>", ":ctprevious<CR>")
+vim.keymap.set("n", "ö<Space>", "mzO<esc>`z", { desc = "Add empty line above cursor"})
+vim.keymap.set("n", "äa", ":next<CR>")
+vim.keymap.set("n", "äA", ":last<CR>")
+vim.keymap.set("n", "äb", ":bnext<CR>")
+vim.keymap.set("n", "äB", ":blast<CR>")
+vim.keymap.set("n", "äd", "<cmd>lua vim.diagnostic.jump({count=1})<cr>", {desc = "Jump to the next diagnostic in the current buffer"})
+vim.keymap.set("n", "äD", "<cmd>lua vim.diagnostic.jump({count=1000})<cr>", {desc = "Jump to the last diagnostic in the current buffer"})
+vim.keymap.set("n", "äl", ":lnext<CR>")
+vim.keymap.set("n", "äL", ":llast<CR>")
+vim.keymap.set("n", "äm", "]m", { desc = "Next method start"})
+vim.keymap.set("n", "äM", "]M", { desc = "Next method end"})
+vim.keymap.set("n", "äq", ":cnext<CR>")
+vim.keymap.set("n", "äQ", ":clast<CR>")
+vim.keymap.set("n", "äs", "]s", { desc = "Next misspelled word"} )
+vim.keymap.set("n", "ät", ":tnext<CR>")
+vim.keymap.set("n", "äT", ":tlast<CR>")
+vim.keymap.set("n", "ä%", "<Plug>(MatchitNormalMultiForward)", {desc = "Next unmatched group"})
+vim.keymap.set("x", "ä%", "<Plug>(MatchitVisualMultiForward)")
+vim.keymap.set("o", "ä%", "<Plug>(MatchitOperationMultiForward)")
+vim.keymap.set("n", "ä)", "])")
+vim.keymap.set("n", "ä>", "]>")
+vim.keymap.set("n", "äÄ", "]}")
+vim.keymap.set("n", "ää", "]]")
+vim.keymap.set("n", "ä<C-L>", ":lnfile<CR>")
+vim.keymap.set("n", "ä<C-Q>", ":cnfile<CR>")
+vim.keymap.set("n", "ä<C-T>", ":ctnext<CR>")
+vim.keymap.set("n", "ä<Space>", "mzo<esc>`z", { desc = "Add empty line below cursor"})
 
 -- general vim QoL improvments
+vim.keymap.set("n", "<F1>", function() local wordUnderCursor = vim.fn.expand("<cword>"); vim.cmd("tab Man " .. wordUnderCursor) end, { desc = "Get Man page for word under cursor" })
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("n", "<Esc>", "<Esc>:noh<CR>")
@@ -28,31 +82,30 @@ vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 
 -- LSP bindings
+-- Default mappings since 0.11
+-- grn in Normal mode maps to vim.lsp.buf.rename()
+-- grr in Normal mode maps to vim.lsp.buf.references()
+-- gri in Normal mode maps to vim.lsp.buf.implementation()
+-- gO in Normal mode maps to vim.lsp.buf.document_symbol()
+-- gra in Normal and Visual mode maps to vim.lsp.buf.code_action()
+-- CTRL-S in Insert and Select mode maps to vim.lsp.buf.signature_help()
 vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', {  desc = "Show documentation" })
-vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
-vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
-vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', { desc = "Go to implementation" })
-vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
-vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', { desc = "Show occurrences of this object" })
-vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', { desc = "Signature help" })
-vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = "Rename in buffer" })
+vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '<leader>gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
+vim.keymap.set('n', '<leader>gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
+vim.keymap.set('n', '<leader>go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
 vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
   function()
     if vim.api.nvim_get_mode().mode == 'n' then
-      if AllowGlobalFormat then
+      if (AllowGlobalFormat) then
+        vim.lsp.buf.format({ async = true })
+      else
         vim.lsp.buf.format({ async = true })
       end
-    else
-      vim.lsp.buf.format({ async = true })
     end
-  end,
-  { desc = "Format buffer" })
-vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = "Apply suggested fix" })
+   end, { desc = "Format buffer" })
 vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>', { desc = "Open diagnostic" })
-vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
-vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to previous diagnositc" })
-vim.keymap.set('n', '<leader>gN', '<cmd>lua vim.diagnostic.goto_next()<cr>', { desc = "Go to next diagnostic" })
-vim.keymap.set('n', '<leader>gP', '<cmd>lua vim.diagnostic.goto_prev()<cr>', { desc = "Go to previous diagnositc" })
 vim.keymap.set('n', '<leader>sqf', '<cmd>lua vim.diagnostic.setqflist()<cr>', { desc = "Set quickfix list" })
 
 -- nvim-bqf (better quickfix list)
@@ -70,9 +123,25 @@ local function toggleQuickfix()
   end
 end
 
-vim.keymap.set("n", "<leader>qf", toggleQuickfix, { desc = "Toggle quickfix list" })
-vim.keymap.set("n", "<leader>qn", vim.cmd.cnext, { desc = "Next quickfix item" })
-vim.keymap.set("n", "<leader>qp", vim.cmd.cprev, { desc = "Previous quickfix item" })
+local function toggleLocation()
+  local qfopen = false
+  for _, w in pairs(vim.api.nvim_list_wins()) do
+    print (vim.fn.win_gettype(w))
+    if (vim.fn.win_gettype(w) == "loclist") then
+      qfopen = true
+    end
+  end
+  if (not qfopen) then
+    vim.cmd("lopen 4")
+  else
+    vim.cmd.lclose()
+  end
+end
+
+vim.keymap.set("n", "<leader>q", toggleQuickfix, { desc = "Toggle quickfix list" })
+vim.keymap.set("n", "<leader>w", toggleLocation, { desc = "Toggle quickfix list" })
+
+-- File explorer (directory tree)
 vim.keymap.set("n", "<leader>ft", require("nvim-tree.api").tree.toggle, { desc = "Open file explorer" })
 vim.keymap.set("n", "<space>fe", function()
   require("telescope").extensions.file_browser.file_browser()
@@ -177,7 +246,7 @@ vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_curso
 vim.keymap.set('v', '<leader>fg', live_grep_args_shortcuts.grep_visual_selection, { desc = "Find word in visual selection" })
 vim.keymap.set('n', '<leader>fW', live_grep_args_shortcuts.grep_word_under_cursor_current_buffer, { desc = "Find word under cursor in current buffer" })
 vim.keymap.set('v', '<leader>fG', live_grep_args_shortcuts.grep_word_visual_selection_current_buffer, { desc = "Find word in visual selection in current buffer" })
-vim.keymap.set('n', '<leader>fg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = "Grep files" })
+vim.keymap.set('n', '<leader>fg', require("telescope").extensions.live_grep_args.live_grep_args, { desc = "Grep files" })
 vim.keymap.set('n', '<leader>l', function() tb.buffers({ sort_mru = true }) end, { desc = "Find in buffers" })
 vim.keymap.set('n', '<leader>fl', tb.oldfiles, { desc = "Previously opened files" })
 vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = "Find help" })

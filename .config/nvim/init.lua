@@ -53,17 +53,16 @@ Spec = {
   -- git
   { "tpope/vim-fugitive" },
   -- LSP auto setup
-  { 'VonHeikemen/lsp-zero.nvim',        branch = 'v4.x' },
   { 'williamboman/mason.nvim' },
   { 'williamboman/mason-lspconfig.nvim' },
   { 'neovim/nvim-lspconfig' },
   -- DAP (debug adapter protocol)
   { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
   -- autocomplete
-  { 'hrsh7th/cmp-nvim-lsp',commit = "99290b3ec1322070bcfb9e846450a46f6efa50f0" },
-  { 'hrsh7th/nvim-cmp', commit = "1e1900b0769324a9675ef85b38f99cca29e203b3" },
+  { 'hrsh7th/cmp-nvim-lsp'},
+  { 'hrsh7th/nvim-cmp'},
   { 'hrsh7th/cmp-cmdline' },
-  { 'hrsh7th/cmp-path', commit = "91ff86cd9c29299a64f968ebb45846c485725f23" },
+  { 'hrsh7th/cmp-path'},
   -- live grep
   {
     'nvim-telescope/telescope.nvim',
@@ -136,7 +135,18 @@ Spec = {
       use_git_branch = true,
       -- log_level = 'debug',
     }
-  }
+    },
+    { "github/copilot.vim" },
+    {
+        "CopilotC-Nvim/CopilotChat.nvim",
+        dependencies = {
+            { "github/copilot.vim" },               -- or zbirenbaum/copilot.lua
+            { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+        },
+        build = "make tiktoken",                    -- Only on MacOS or Linux
+        opts = {
+        }
+    },
 }
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_includes.lua")) then

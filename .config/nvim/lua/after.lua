@@ -42,6 +42,8 @@ vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "
 vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
+vim.cmd("ca G tab G")
+vim.cmd("autocmd FileType help wincmd T")
 
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
@@ -413,6 +415,8 @@ cmp.setup({
     end,
   },
 })
+
+
 -- `/` cmdline setup.
 cmp.setup.cmdline('/', {
   mapping = cmp.mapping.preset.cmdline(),
