@@ -1,16 +1,16 @@
 -- Globals
 if (os.getenv("UNDODIR") ~= nil) then
-  vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
+    vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
 else
-  vim.opt.undodir = os.getenv("HOME") .. "/.local/nvim/undodir"
+    vim.opt.undodir = os.getenv("HOME") .. "/.local/nvim/undodir"
 end
 Mysrcpath = os.getenv("HOME") .. "/src"
 Mybuildpath = os.getenv("HOME") .. "/build"
 if (os.getenv("mysrcpath") ~= nil) then
-  Mysrcpath = os.getenv("mysrcpath")
+    Mysrcpath = os.getenv("mysrcpath")
 end
 if (os.getenv("mybuildpath") ~= nil) then
-  Mybuildpath = os.getenv("mybuildpath")
+    Mybuildpath = os.getenv("mybuildpath")
 end
 AllowGlobalFormat = false
 GithubCopilotEnabled = false
@@ -37,9 +37,9 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "140"
-vim.opt.signcolumn='yes'
+vim.opt.signcolumn = 'yes'
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
-vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
 vim.cmd("ca G tab G")
@@ -47,7 +47,7 @@ vim.cmd("autocmd FileType help wincmd T")
 
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
-vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q") | !echo -ne "\033]12;#C8C093\007"')
+vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q")' )
 
 
 -- Lualine statusbar settings
@@ -59,10 +59,10 @@ local function selectionCount()
     local lines = starts <= ends and ends - starts + 1 or starts - ends + 1
     return "/ " .. tostring(lines) .. "L " .. tostring(vim.fn.wordcount().visual_chars) .. "C"
 end
-local function isRecording ()
-  local reg = vim.fn.reg_recording()
-  if reg == "" then return "" end -- not recording
-  return "recording to " .. reg
+local function isRecording()
+    local reg = vim.fn.reg_recording()
+    if reg == "" then return "" end -- not recording
+    return "recording to " .. reg
 end
 require('lualine').setup({
     sections = {
@@ -73,9 +73,9 @@ require('lualine').setup({
     }
 })
 ContextMaxHeight = 1
-require'treesitter-context'.setup{
-  max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
-  trim_scope = 'inner'
+require 'treesitter-context'.setup {
+    max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
+    trim_scope = 'inner'
 }
 
 -- Telescope (fuzzy finder)
@@ -167,31 +167,31 @@ require('bqf.config').preview.winblend = 0
 
 -- Treesitter (highlighting)
 require 'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+    -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+    ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
 
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
+    -- Install parsers synchronously (only applied to `ensure_installed`)
+    sync_install = false,
 
-  -- Automatically install missing parsers when entering buffer
-  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
-  indent = {
-    enable = false,
-  },
+    -- Automatically install missing parsers when entering buffer
+    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+    auto_install = true,
+    indent = {
+        enable = false,
+    },
 
-  highlight = {
-    enable = true,
--- Disable these settings in hopes that nvim 0.11 treesitter performance improvements fix these issues
---     disable = function(_, buf)
---       local max_filesize = 1024 * 1024 -- 1MiB
---       local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
---       if ok and stats and stats.size > max_filesize then
---         return true
---       end
---     end,
---     additional_vim_regex_highlighting = false,
-  },
+    highlight = {
+        enable = true,
+        -- Disable these settings in hopes that nvim 0.11 treesitter performance improvements fix these issues
+        --     disable = function(_, buf)
+        --       local max_filesize = 1024 * 1024 -- 1MiB
+        --       local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+        --       if ok and stats and stats.size > max_filesize then
+        --         return true
+        --       end
+        --     end,
+        --     additional_vim_regex_highlighting = false,
+    },
 }
 
 -- Disable these settings in hopes that nvim 0.11 treesitter performance improvements fix these issues
@@ -221,29 +221,29 @@ require 'nvim-treesitter.configs'.setup {
 
 pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
 vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    local arg = vim.fn.argv(0)
-    if #arg == 1 and vim.fn.isdirectory(vim.fn.expand(arg)) ~= 0 then
-      require("telescope").extensions.file_browser.file_browser()
-    end
-  end,
+    callback = function()
+        local arg = vim.fn.argv(0)
+        if #arg == 1 and vim.fn.isdirectory(vim.fn.expand(arg)) ~= 0 then
+            require("telescope").extensions.file_browser.file_browser()
+        end
+    end,
 })
 
 require('mason').setup({})
-vim.lsp.config.clangd =  {
- root_markers = { '.clangd', 'compile_commands.json' },
- filetypes = { 'c', 'cpp' },
-  cmd = {
-    "clangd",
-    "--enable-config",
-    "--fallback-style=llvm",
-    "--header-insertion=never",
-    "--offset-encoding=utf-16"
-  }
+vim.lsp.config.clangd = {
+    root_markers = { '.clangd', 'compile_commands.json' },
+    filetypes = { 'c', 'cpp' },
+    cmd = {
+        "clangd",
+        "--enable-config",
+        "--fallback-style=llvm",
+        "--header-insertion=never",
+        "--offset-encoding=utf-16"
+    }
 }
-vim.lsp.config['luals'] = {
-  cmd = { 'lua-language-server' },
-  filetypes = { 'lua' },
+vim.lsp.config.luals = {
+    cmd = { 'lua-language-server' },
+    filetypes = { 'lua' },
     settings = {
         Lua = {
             runtime = { version = 'LuaJIT' },
@@ -251,29 +251,36 @@ vim.lsp.config['luals'] = {
         }
     }
 }
-vim.lsp.enable({ "luals", "clangd" })
+
+vim.lsp.config.ts_ls = {
+    cmd = { "typescript-language-server", "--stdio" },
+    filetypes = { "javascript", "typescript", "vue", },
+       settings = { hostInfo = "neovim" },
+}
+
+vim.lsp.enable({ "luals", "clangd", "ts_ls" })
 
 
 local dap = require("dap")
 dap.adapters.gdb = {
-  type = "executable",
-  command = "gdb",
-  args = { "--interpreter=dap", "--eval-command", "set print pretty on"  }
+    type = "executable",
+    command = "gdb",
+    args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
 }
 dap.configurations.cpp = {
-  {
-    name = "Launch",
-    type = "gdb",
-    request = "launch",
-    program = function()
-      return vim.fn.input('Path to executable: ', Mybuildpath, "file")
-    end,
-    args = function()
-      return vim.fn.input('Select filter for test: ', '--gtest_filter=')
-    end,
-    cwd = Mybuildpath,
-    stopAtBeginningOfMainSubprogram = false
-  }
+    {
+        name = "Launch",
+        type = "gdb",
+        request = "launch",
+        program = function()
+            return vim.fn.input('Path to executable: ', Mybuildpath, "file")
+        end,
+        args = function()
+            return vim.fn.input('Select filter for test: ', '--gtest_filter=')
+        end,
+        cwd = Mybuildpath,
+        stopAtBeginningOfMainSubprogram = false
+    }
 }
 
 require("dapui").setup()
@@ -281,162 +288,162 @@ require("dapui").setup()
 -- Autocomplete (via cmp)
 local cmp = require('cmp')
 local kind_icons = {
-  Text = "",
-  Method = "󰆧",
-  Function = "󰊕",
-  Constructor = "",
-  Field = "󰇽",
-  Variable = "󰂡",
-  Class = "󰠱",
-  Interface = "",
-  Module = "",
-  Property = "󰜢",
-  Unit = "",
-  Value = "󰎠",
-  Enum = "",
-  Keyword = "󰌋",
-  Snippet = "",
-  Color = "󰏘",
-  File = "󰈙",
-  Reference = "",
-  Folder = "󰉋",
-  EnumMember = "",
-  Constant = "󰏿",
-  Struct = "",
-  Event = "",
-  Operator = "󰆕",
-  TypeParameter = "󰅲",
+    Text = "",
+    Method = "󰆧",
+    Function = "󰊕",
+    Constructor = "",
+    Field = "󰇽",
+    Variable = "󰂡",
+    Class = "󰠱",
+    Interface = "",
+    Module = "",
+    Property = "󰜢",
+    Unit = "",
+    Value = "󰎠",
+    Enum = "",
+    Keyword = "󰌋",
+    Snippet = "",
+    Color = "󰏘",
+    File = "󰈙",
+    Reference = "",
+    Folder = "󰉋",
+    EnumMember = "",
+    Constant = "󰏿",
+    Struct = "",
+    Event = "",
+    Operator = "󰆕",
+    TypeParameter = "󰅲",
 }
 cmp.setup({
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = "path" },
-  },
-  window = {
-    -- completion = cmp.config.window.bordered(),
-    -- documentation = cmp.config.window.bordered(),
-  },
-  formatting = {
-    fields = { "abbr", "kind", "menu" },
-    format = function(_, item)
-      item.kind = kind_icons[item.kind]
+    sources = {
+        { name = 'nvim_lsp' },
+        { name = "path" },
+    },
+    window = {
+        -- completion = cmp.config.window.bordered(),
+        -- documentation = cmp.config.window.bordered(),
+    },
+    formatting = {
+        fields = { "abbr", "kind", "menu" },
+        format = function(_, item)
+            item.kind = kind_icons[item.kind]
 
-      -- Set the fixed width of the completion menu to 60 characters.
-      local fixed_width = false
-      -- Set 'fixed_width' to false if not provided.
-      -- fixed_width = fixed_width or false
+            -- Set the fixed width of the completion menu to 60 characters.
+            local fixed_width = false
+            -- Set 'fixed_width' to false if not provided.
+            -- fixed_width = fixed_width or false
 
-      -- Get the completion entry text shown in the completion window.
-      local content = item.abbr
-      local sig = item.menu
+            -- Get the completion entry text shown in the completion window.
+            local content = item.abbr
+            local sig = item.menu
 
-      -- Set the fixed completion window width.
-      if fixed_width then
-        vim.o.pumwidth = fixed_width
-      end
+            -- Set the fixed completion window width.
+            if fixed_width then
+                vim.o.pumwidth = fixed_width
+            end
 
-      -- Get the width of the current window.
-      local win_width = vim.api.nvim_win_get_width(0)
+            -- Get the width of the current window.
+            local win_width = vim.api.nvim_win_get_width(0)
 
-      -- Set the max content width based on either: 'fixed_width'
-      -- or a percentage of the window width, in this case 25%.
-      -- We subtract 10 from 'fixed_width' to leave room for 'kind' fields.
-      local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.25)
+            -- Set the max content width based on either: 'fixed_width'
+            -- or a percentage of the window width, in this case 25%.
+            -- We subtract 10 from 'fixed_width' to leave room for 'kind' fields.
+            local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.25)
 
-      -- Truncate the completion entry text if it's longer than the
-      -- max content width. We subtract 3 from the max content width
-      -- to account for the "..." that will be appended to it.
-      if #content > max_content_width then
-        item.abbr = vim.fn.strcharpart(content, 0, max_content_width - 3) .. "..."
-      else
-        item.abbr = content .. (" "):rep(max_content_width - #content)
-      end
+            -- Truncate the completion entry text if it's longer than the
+            -- max content width. We subtract 3 from the max content width
+            -- to account for the "..." that will be appended to it.
+            if #content > max_content_width then
+                item.abbr = vim.fn.strcharpart(content, 0, max_content_width - 3) .. "..."
+            else
+                item.abbr = content .. (" "):rep(max_content_width - #content)
+            end
 
-      local sig_mult = .8
-      if sig ~= nil then
-        if #sig > math.floor(max_content_width * sig_mult) then
-          item.menu = vim.fn.strcharpart(sig, 0, math.floor(max_content_width * sig_mult) - 3) .. "..."
-        else
-          item.menu = sig .. (" "):rep(math.floor(max_content_width * sig_mult) - #sig)
-        end
-      end
-      return item
-    end,
-  },
-  view = {
-    entries = "custom" -- can be "custom", "wildmenu" or "native"
-  },
-  mapping = cmp.mapping.preset.insert({
-    -- Navigate between completion items
-    ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = 'select' }),
-    ['<C-n>'] = cmp.mapping.select_next_item({ behavior = 'select' }),
+            local sig_mult = .8
+            if sig ~= nil then
+                if #sig > math.floor(max_content_width * sig_mult) then
+                    item.menu = vim.fn.strcharpart(sig, 0, math.floor(max_content_width * sig_mult) - 3) .. "..."
+                else
+                    item.menu = sig .. (" "):rep(math.floor(max_content_width * sig_mult) - #sig)
+                end
+            end
+            return item
+        end,
+    },
+    view = {
+        entries = "custom" -- can be "custom", "wildmenu" or "native"
+    },
+    mapping = cmp.mapping.preset.insert({
+        -- Navigate between completion items
+        ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = 'select' }),
+        ['<C-n>'] = cmp.mapping.select_next_item({ behavior = 'select' }),
 
-    -- `Enter` key to confirm completion
-    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+        -- `Enter` key to confirm completion
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
 
-    ['<Tab>'] =  cmp.mapping(function(fallback)
-                   local col = vim.fn.col('.') - 1
+        ['<Tab>'] = cmp.mapping(function(fallback)
+            local col = vim.fn.col('.') - 1
 
-                   if cmp.visible() then
-                     cmp.select_next_item( false)
-                   elseif col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-                     fallback()
-                   else
-                     cmp.complete()
-                   end
-                 end, {'i', 's'}),
+            if cmp.visible() then
+                cmp.select_next_item(false)
+            elseif col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+                fallback()
+            else
+                cmp.complete()
+            end
+        end, { 'i', 's' }),
 
-    -- Ctrl+Space to trigger completion menu
-    ['<C-Space>'] = cmp.mapping.complete(),
+        -- Ctrl+Space to trigger completion menu
+        ['<C-Space>'] = cmp.mapping.complete(),
 
-    -- Navigate between snippet placeholder
-    ['<C-f>'] = cmp.mapping(function(fallback)
-                  if vim.snippet.active({direction = 1}) then
-                    vim.snippet.jump(1)
-                  else
-                    fallback()
-                  end
-                end, {'i', 's'}),
-    ['<C-b>'] = cmp.mapping(function(fallback)
-                  if vim.snippet.active({direction = -1}) then
-                    vim.snippet.jump(-1)
-                  else
-                    fallback()
-                  end
-                end, {'i', 's'}),
+        -- Navigate between snippet placeholder
+        ['<C-f>'] = cmp.mapping(function(fallback)
+            if vim.snippet.active({ direction = 1 }) then
+                vim.snippet.jump(1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' }),
+        ['<C-b>'] = cmp.mapping(function(fallback)
+            if vim.snippet.active({ direction = -1 }) then
+                vim.snippet.jump(-1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' }),
 
-    -- Scroll up and down in the completion documentation
-    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-d>'] = cmp.mapping.scroll_docs(4),
-  }),
-  snippet = {
-    expand = function(args)
-      vim.snippet.expand(args.body)
-    end,
-  },
+        -- Scroll up and down in the completion documentation
+        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    }),
+    snippet = {
+        expand = function(args)
+            vim.snippet.expand(args.body)
+        end,
+    },
 })
 
 
 -- `/` cmdline setup.
 cmp.setup.cmdline('/', {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = {
-    { name = 'buffer' }
-  }
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+        { name = 'buffer' }
+    }
 })
 -- `:` cmdline setup.
 cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
-    {
-      name = 'cmdline',
-      option = {
-        ignore_cmds = { 'Man', '!' }
-      }
-    }
-  })
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+        { name = 'path' }
+    }, {
+        {
+            name = 'cmdline',
+            option = {
+                ignore_cmds = { 'Man', '!' }
+            }
+        }
+    })
 })
 
 -- Copilot settings
@@ -447,9 +454,9 @@ else
 end
 
 vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
-  fg = '#c4b5c4',
-  ctermfg = 8,
-  force = true
+    fg = '#c4b5c4',
+    ctermfg = 8,
+    force = true
 })
 
 -- project navigation
