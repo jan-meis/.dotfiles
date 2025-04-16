@@ -1,5 +1,5 @@
--- coping with a German keyboard
-vim.opt.langmap = "-/_?ö[Ö{ä]Ä}"
+-- coping with a german keyboard
+vim.opt.langmap = "-/_?Ö{ö[Ä}ä]"
 vim.keymap.set({ "i" }, "ö", "{")
 vim.keymap.set({ "i" }, "ä", "}")
 vim.keymap.set({ "i" }, "Ö", "[")
@@ -94,6 +94,8 @@ vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity 
 vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
 vim.keymap.set('n', '<leader>gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
 vim.keymap.set('n', '<leader>gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
+vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
+vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
 vim.keymap.set('n', '<leader>go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
 vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
   function()
