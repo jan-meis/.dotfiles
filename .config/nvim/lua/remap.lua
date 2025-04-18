@@ -98,15 +98,15 @@ vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go
 vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
 vim.keymap.set('n', '<leader>go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
 vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
-  function()
-    if vim.api.nvim_get_mode().mode == 'n' then
-      if (AllowGlobalFormat) then
-        vim.lsp.buf.format({ async = true })
-      else
-        vim.lsp.buf.format({ async = true })
-      end
-    end
-   end, { desc = "Format buffer" })
+    function()
+        if vim.api.nvim_get_mode().mode == 'n' then
+            if (AllowGlobalFormat) then
+                vim.lsp.buf.format({ async = true })
+            end
+        else
+            vim.lsp.buf.format({ async = true })
+        end
+    end, { desc = "Format buffer" })
 vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>', { desc = "Open diagnostic" })
 vim.keymap.set('n', '<leader>sqf', '<cmd>lua vim.diagnostic.setqflist()<cr>', { desc = "Set quickfix list" })
 
