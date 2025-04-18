@@ -20,6 +20,7 @@ HISTSIZE=10000
 HISTFILESIZE=20000
 # avoid duplicates..
 export HISTCONTROL=ignoredups:erasedups  
+HISTIGNORE='*Microsoft-MIEngine-Cmd-*'
 # append history entries..
 shopt -s histappend
 # After each command, save and reload history
