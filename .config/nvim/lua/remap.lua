@@ -119,7 +119,7 @@ local function toggleQuickfix()
     end
   end
   if (not qfopen) then
-    vim.cmd("copen 4")
+    vim.cmd("copen 6")
   else
     vim.cmd.cclose()
   end
@@ -134,7 +134,7 @@ local function toggleLocation()
     end
   end
   if (not qfopen) then
-    vim.cmd("lopen 4")
+    vim.cmd("lopen 6")
   else
     vim.cmd.lclose()
   end

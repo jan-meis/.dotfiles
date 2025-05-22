@@ -15,6 +15,7 @@ end
 AllowGlobalFormat = false
 GithubCopilotEnabled = false
 
+vim.opt.spell = true
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -164,6 +165,7 @@ require('telescope').load_extension('file_browser')
 
 -- Better quickfix
 require('bqf.config').preview.winblend = 0
+require('bqf.config').preview.win_height = 999
 
 -- Treesitter (highlighting)
 require 'nvim-treesitter.configs'.setup {
@@ -257,8 +259,21 @@ vim.lsp.config.ts_ls = {
     filetypes = { "javascript", "typescript", "vue", },
        settings = { hostInfo = "neovim" },
 }
+vim.lsp.config.perlnavigator = {
+    cmd = { "perlnavigator" },
+    settings = {
+      perlnavigator = {
+          perlPath = 'perl',
+          enableWarnings = true,
+          perltidyProfile = '',
+          perlcriticProfile = '',
+          perlcriticEnabled = true,
+          includePaths = { '~/perllib' },
+      }
+    }
+}
 
-vim.lsp.enable({ "luals", "clangd", "ts_ls" })
+vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright" })
 
 
 local dap = require("dap")
