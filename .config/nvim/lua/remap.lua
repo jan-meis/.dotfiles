@@ -1,3 +1,16 @@
+-- global functions
+function InsertFilename()
+    local current_file_name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
+    local pos = vim.api.nvim_win_get_cursor(0)[2]
+    local line = vim.api.nvim_get_current_line()
+    local nline = line:sub(0, pos) .. current_file_name .. line:sub(pos + 1)
+    vim.api.nvim_set_current_line(nline)
+end
+
+function TmuxSend(command, pane)
+  vim.cmd('!tmux send-keys -t ' .. pane .. ' \"' ..  command .. '" ENTER')
+end
+
 -- coping with a german keyboard
 vim.opt.langmap = "-/_?Ö{ö[Ä}ä]"
 vim.keymap.set({ "i" }, "ö", "{")
@@ -263,7 +276,7 @@ vim.keymap.set('n', '<leader>fc',
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
 
 -- fugitive (git)
-vim.keymap.set("n", "<leader>gs", ":! git add . && git commit -m 'sync' && git push ccde<CR>",
+vim.keymap.set("n", "<leader>gs", ":! git add . && (git diff HEAD | git commit -F -) && git push ccde<CR>",
   { desc = "sync git with ccde" })
 vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
 
@@ -276,19 +289,5 @@ vim.keymap.set({ "n", "v" }, "zz", function() require("cinnamon").scroll("zz") e
 vim.keymap.set({ "n", "v" }, "<C-e>", function() require("cinnamon").scroll("<C-e>") end)
 vim.keymap.set({ "n", "v" }, "<C-y>", function() require("cinnamon").scroll("<C-y>") end)
 
--- Harpoon (quick navigation)
-local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>m", function() harpoon:list():add() end, { desc = "Add to harpoon list" })
-vim.keymap.set("n", "<leader>`", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Show harpoon list" })
-vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Go to 1. harpoon list entry" })
-vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Go to 2. harpoon list entry" })
-vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Go to 3. harpoon list entry" })
-vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Go to 4. harpoon list entry" })
-vim.keymap.set("n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Go to 5. harpoon list entry" })
-vim.keymap.set("n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Go to 1. harpoon list entry" })
-vim.keymap.set("n", "<leader>7", function() harpoon:list():select(7) end, { desc = "Go to 2. harpoon list entry" })
-vim.keymap.set("n", "<leader>8", function() harpoon:list():select(8) end, { desc = "Go to 3. harpoon list entry" })
-vim.keymap.set("n", "<leader>9", function() harpoon:list():select(9) end, { desc = "Go to 4. harpoon list entry" })
-vim.keymap.set("n", "<leader>0", function() harpoon:list():select(10) end, { desc = "Go to 5. harpoon list entry" })
-vim.keymap.set("n", "<leader>n", function() harpoon:list():prev() end, { desc = "Go to next harpoon list entry" })
-vim.keymap.set("n", "<leader>N", function() harpoon:list():next() end, { desc = "Go to previous harpoon list entry" })
+-- arrow (quick navigation)
+vim.keymap.set({ "n" }, "<leader>m", "m" )

@@ -40,7 +40,7 @@ vim.opt.updatetime = 50
 vim.opt.colorcolumn = "140"
 vim.opt.signcolumn = 'yes'
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
-vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+--vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
 vim.cmd("ca G tab G")
@@ -52,6 +52,7 @@ vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q")' )
 
 
 -- Lualine statusbar settings
+local statusline = require('arrow.statusline') -- for arrow.nvim in statusline
 local function selectionCount()
     local isVisualMode = vim.fn.mode():find("[Vv]")
     if not isVisualMode then return "" end
@@ -67,12 +68,18 @@ local function isRecording()
 end
 require('lualine').setup({
     sections = {
-        lualine_c = { { 'filename', path = 1 }, { isRecording } },
+        lualine_c = { { 'filename', path = 1 }, { function () return statusline.text_for_statusline_with_icons() end }, { isRecording } },
         lualine_z = { "location",
             { selectionCount },
         },
     }
 })
+
+-- because i use autosession, this needs to be refreshed manually
+-- require("arrow.git").refresh_git_branch() -- only if separated_by_branch is true
+-- require("arrow.persist").load_cache_file()
+
+-- Function signature context at the top
 ContextMaxHeight = 1
 require 'treesitter-context'.setup {
     max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
@@ -475,7 +482,8 @@ vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
 })
 
 -- project navigation
-require("harpoon"):setup()
+-- require("harpoon"):setup()
+
 -- smooth scrolling
 require("cinnamon").setup()
 

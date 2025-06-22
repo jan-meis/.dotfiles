@@ -116,7 +116,21 @@ Spec = {
     },
   },
   -- better global marks
-  { "davvid/harpoon",        branch = "save-cursor-position", dependencies = { "nvim-lua/plenary.nvim" } },
+  -- { "davvid/harpoon",        branch = "save-cursor-position", dependencies = { "nvim-lua/plenary.nvim" } },
+    {
+        "otavioschwanck/arrow.nvim",
+        dependencies = {
+            { "nvim-tree/nvim-web-devicons" },
+            -- or if using `mini.icons`
+            -- { "echasnovski/mini.icons" },
+        },
+        opts = {
+            show_icons = true,
+            leader_key = ',', -- Recommended to be a single key
+            buffer_leader_key = 'm', -- Per Buffer Mappings
+            separate_by_branch = true,
+        }
+    },
   -- write with sudo
   { "lambdalisue/vim-suda" },
   -- prettier movement animation
@@ -124,17 +138,17 @@ Spec = {
   -- prttier status line
   { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
   -- save last opened file
-  {
-    'rmagatti/auto-session',
-    lazy = false,
-    ---enables autocomplete for opts
-    ---@module "auto-session"
-    ---@type AutoSession.Config
-    opts = {
-      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
-      use_git_branch = true,
-      -- log_level = 'debug',
-    }
+    {
+        'rmagatti/auto-session',
+        lazy = false,
+        ---enables autocomplete for opts
+        ---@module "auto-session"
+        ---@type AutoSession.Config
+        opts = {
+            suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+            use_git_branch = true,
+            -- log_level = 'debug',
+        }
     },
     { "github/copilot.vim" },
     {
