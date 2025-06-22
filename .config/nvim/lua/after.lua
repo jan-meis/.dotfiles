@@ -280,8 +280,12 @@ vim.lsp.config.perlnavigator = {
     }
 }
 
-vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright" })
-
+vim.lsp.config.gdscript = {
+    cmd = { "godot-wsl-lsp", "--useMirroredNetworking" },
+    filetypes = { "gd", "gdscript" },
+    root_markers = { ".godot" }
+}
+vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript" })
 
 local dap = require("dap")
 dap.adapters.gdb = {

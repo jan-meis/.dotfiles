@@ -56,6 +56,7 @@ Spec = {
   { 'williamboman/mason.nvim' },
   { 'williamboman/mason-lspconfig.nvim' },
   { 'neovim/nvim-lspconfig' },
+  { 'lucasecdb/godot-wsl-lsp' },
   -- DAP (debug adapter protocol)
   { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
   -- autocomplete
