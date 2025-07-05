@@ -130,6 +130,10 @@ Spec = {
             leader_key = ',', -- Recommended to be a single key
             buffer_leader_key = 'm', -- Per Buffer Mappings
             separate_by_branch = true,
+            mappings = {
+                next_item = "ä",
+                prev_item = "ö"
+            }
         }
     },
   -- write with sudo

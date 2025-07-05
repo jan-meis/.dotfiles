@@ -247,7 +247,7 @@ vim.keymap.set("n", "<leader>c+", function()
         ContextMaxHeight = ContextMaxHeight + 1
         require 'treesitter-context'.setup { max_lines = ContextMaxHeight, trim_scope = 'inner' }
 end, { desc = "Increase context line height" })
-vim.keymap.set("n", "<leader>c-", function()
+vim.keymap.set("n", "<leader>c/", function()
         ContextMaxHeight = ContextMaxHeight - 1
         require 'treesitter-context'.setup { max_lines = ContextMaxHeight, trim_scope = 'inner' }
 end, { desc = "Increase context line height" })
