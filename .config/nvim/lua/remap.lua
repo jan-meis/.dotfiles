@@ -186,7 +186,7 @@ local function setFilePathAndLineNumber()
   print(string.format("Set $CURRENT_BREAKPOINT to %s.", ret))
 end
 local function getCurrentTest()
-  vim.fn.feedkeys('mx?TEST_\rf(l"cywf,w"vyw`x', "x")
+  vim.fn.feedkeys(':mark x\r?TEST_\rf(l"cywf,w"vyw`x', "x")
   vim.cmd("noh")
   return (vim.fn.getreg("c") .. "." .. vim.fn.getreg("v"))
 end
@@ -258,6 +258,7 @@ local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
 vim.keymap.set('n', '<leader>ff', tb.find_files, { desc = "Find files" })
 vim.keymap.set('n', '<leader>fr', tb.resume, { desc = "Resume telescope search" })
 vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_cursor, { desc = "Find word under cursor" })
+vim.keymap.set('n', '<leader>fi', function() live_grep_args_shortcuts.grep_word_under_cursor({ postfix = "", quote = false }) end, { desc = "Find word in visual selection" })
 vim.keymap.set('v', '<leader>fg', live_grep_args_shortcuts.grep_visual_selection, { desc = "Find word in visual selection" })
 vim.keymap.set('n', '<leader>fW', live_grep_args_shortcuts.grep_word_under_cursor_current_buffer, { desc = "Find word under cursor in current buffer" })
 vim.keymap.set('v', '<leader>fG', live_grep_args_shortcuts.grep_word_visual_selection_current_buffer, { desc = "Find word in visual selection in current buffer" })
@@ -276,9 +277,25 @@ vim.keymap.set('n', '<leader>fc',
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
 
 -- fugitive (git)
-vim.keymap.set("n", "<leader>gs", ":! git add . && (git diff HEAD | git commit -F -) && git push ccde<CR>",
-  { desc = "sync git with ccde" })
+-- vim.keymap.set("n", "<leader>gs", ":! git add . && (git diff HEAD | git commit -F -) && git push ccde<CR>", { desc = "git sync with ccde && windows" })
+vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit && git push ccde -f<CR>", { desc = "git sync ammended commit with ccde" })
+vim.keymap.set("n", "<leader>gm",
+    function()
+        local command =
+        "git add . && git commit --amend --no-edit && git push ccde -f && tmux send-keys -t 1 \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER"
+        vim.system(
+            { "sh", "-c",
+                command },
+            nil,
+            function(obj) print("Exit code:", obj.stdout) end)
+        print("Running: " .. command)
+    end, { desc = "git sync and make on ccde" })
+--vim.keymap.set("n", "<leader>gm", function() vim.system({ "sh", "-c", "tmux send-keys -t 1 \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER" } ) end, { desc = "git sync and make on ccde" })
+vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTER<CR>", { desc = "git make on ccde" })
+vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "git ammend commit message" })
+vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "git create new commit" })
 vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
+vim.keymap.set("n", "<leader>eb", ":tabnew ~/build<CR>", { desc = "edit build command" })
 
 -- cinamon (centered scrolling)
 vim.keymap.set({ "n", "v" }, "<C-u>", function() require("cinnamon").scroll("<C-u>zz") end)
@@ -290,4 +307,9 @@ vim.keymap.set({ "n", "v" }, "<C-e>", function() require("cinnamon").scroll("<C-
 vim.keymap.set({ "n", "v" }, "<C-y>", function() require("cinnamon").scroll("<C-y>") end)
 
 -- arrow (quick navigation)
-vim.keymap.set({ "n" }, "<leader>m", "m" )
+vim.keymap.set({ "n" }, "<leader>m", "m" ) -- this will active the non-arrow marks
+
+-- easy navigation to often used files
+vim.keymap.set({ "n" }, "<leader>`r", ":e ~/.config/nvim/lua/remap.lua<CR>")
+vim.keymap.set({ "n" }, "<leader>`a", ":e ~/.config/nvim/lua/after.lua<CR>")
+vim.keymap.set({ "n" }, "<leader>`i", ":e ~/.config/nvim/init.lua<CR>")

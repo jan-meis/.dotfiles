@@ -37,7 +37,7 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "140"
+vim.opt.colorcolumn = "160"
 vim.opt.signcolumn = 'yes'
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
 --vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
@@ -49,6 +49,11 @@ vim.cmd("autocmd FileType help wincmd T")
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
 vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q")' )
+
+-- set some global marks
+vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/init.lua")), "I", 1, 1, {})
+vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/after.lua")), "A", 1, 1, {})
+vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/remap.lua")), "R", 1, 1, {})
 
 
 -- Lualine statusbar settings
