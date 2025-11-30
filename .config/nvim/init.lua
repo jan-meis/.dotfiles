@@ -38,10 +38,17 @@ Spec = {
       'fei6409/log-highlight.nvim',
       config = function()
           require('log-highlight').setup {
+                extension = {
+                    'log',
+                    'error',
+                    'trc',
+                    'trace',
+                    'txt',
+                },
                 pattern = {
                     '/var/log/.*',
                     'messages%..*',
-                    'dev_.*'
+                    'dev_.*',
                 },
           }
       end,
@@ -60,8 +67,8 @@ Spec = {
   -- DAP (debug adapter protocol)
   { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
   -- autocomplete
-  { 'hrsh7th/cmp-nvim-lsp'},
-  { 'hrsh7th/nvim-cmp'},
+  { 'hrsh7th/cmp-nvim-lsp' },
+  { 'hrsh7th/nvim-cmp' },
   { 'hrsh7th/cmp-cmdline' },
   { 'hrsh7th/cmp-path'},
   -- live grep
@@ -77,6 +84,8 @@ Spec = {
     "nvim-telescope/telescope-file-browser.nvim",
     dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
   },
+  { 'nvim-telescope/telescope-ui-select.nvim' },
+  { 'echasnovski/mini.nvim', version = '*' },
   { 'junegunn/fzf' },
   { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   {
@@ -159,13 +168,22 @@ Spec = {
     {
         "CopilotC-Nvim/CopilotChat.nvim",
         dependencies = {
-            { "github/copilot.vim" },               -- or zbirenbaum/copilot.lua
+            { "github/copilot.vim" },                       -- or zbirenbaum/copilot.lua
             { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
         },
-        build = "make tiktoken",                    -- Only on MacOS or Linux
+        build = "make tiktoken",                            -- Only on MacOS or Linux
         opts = {
         }
     },
+    -- {
+    --     'MeanderingProgrammer/render-markdown.nvim',
+    --     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    --     ---@module 'render-markdown'
+    --     ---@type render.md.UserConfig
+    --     opts = {},
+    -- },
 }
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_includes.lua")) then

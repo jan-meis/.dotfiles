@@ -1,4 +1,14 @@
 -- Globals
+local function generate_session_guid()
+    local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    return string.gsub(template, '[xy]', function(c)
+        local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
+        return string.format('%x', v)
+    end)
+end
+vim.g.session_guid = vim.g.session_guid or generate_session_guid()
+vim.g.session_start_time = os.date("%Y-%m-%d_%H:%M:%S", os.time())
+
 if (os.getenv("UNDODIR") ~= nil) then
     vim.opt.undodir = os.getenv("UNDODIR") .. "/.vim/undodir"
 else
@@ -13,9 +23,8 @@ if (os.getenv("mybuildpath") ~= nil) then
     Mybuildpath = os.getenv("mybuildpath")
 end
 AllowGlobalFormat = false
-GithubCopilotEnabled = false
-
-vim.opt.spell = true
+GithubCopilotEnabled = true
+vim.opt.spell = false
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -45,16 +54,17 @@ vim.g.undotree_SetFocusWhenToggle = 1
 vim.cmd("colorscheme kanagawa-wave")
 vim.cmd("ca G tab G")
 vim.cmd("autocmd FileType help wincmd T")
+vim.cmd("autocmd FileType * setlocal formatoptions-=o")
+vim.cmd("set completeopt+=popup")
 
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
-vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q")' )
+vim.cmd(':au VimLeave * set guicursor= | call chansend(v:stderr, "\x1b[ q")')
 
 -- set some global marks
 vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/init.lua")), "I", 1, 1, {})
 vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/after.lua")), "A", 1, 1, {})
 vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/remap.lua")), "R", 1, 1, {})
-
 
 -- Lualine statusbar settings
 local statusline = require('arrow.statusline') -- for arrow.nvim in statusline
@@ -73,16 +83,12 @@ local function isRecording()
 end
 require('lualine').setup({
     sections = {
-        lualine_c = { { 'filename', path = 1 }, { function () return statusline.text_for_statusline_with_icons() end }, { isRecording } },
+        lualine_c = { { 'filename', path = 1 }, { function() return statusline.text_for_statusline_with_icons() end }, { isRecording } },
         lualine_z = { "location",
             { selectionCount },
         },
     }
 })
-
--- because i use autosession, this needs to be refreshed manually
--- require("arrow.git").refresh_git_branch() -- only if separated_by_branch is true
--- require("arrow.persist").load_cache_file()
 
 -- Function signature context at the top
 ContextMaxHeight = 1
@@ -168,12 +174,29 @@ require("telescope").setup {
                     ["<C-Space>"] = actions.to_fuzzy_refine,
                 },
             },
-        }
+        },
     },
 }
 require('telescope').load_extension('fzf')
 require('telescope').load_extension('live_grep_args')
 require('telescope').load_extension('file_browser')
+--require("telescope").load_extension('ui-select')
+-- replace telescop ui select with minipick because its buggy
+local win_config = function()
+    local height = math.floor(0.618 * vim.o.lines)
+    local width = math.floor(0.618 * vim.o.columns)
+    return {
+        anchor = 'NW',
+        height = height,
+        width = width,
+        row = math.floor(0.5 * (vim.o.lines - height)),
+        col = math.floor(0.5 * (vim.o.columns - width)),
+    }
+end
+require('mini.pick').setup({
+    window = { config = win_config },
+})
+vim.ui.select = require('mini.pick').ui_select
 
 -- Better quickfix
 require('bqf.config').preview.winblend = 0
@@ -196,42 +219,8 @@ require 'nvim-treesitter.configs'.setup {
 
     highlight = {
         enable = true,
-        -- Disable these settings in hopes that nvim 0.11 treesitter performance improvements fix these issues
-        --     disable = function(_, buf)
-        --       local max_filesize = 1024 * 1024 -- 1MiB
-        --       local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-        --       if ok and stats and stats.size > max_filesize then
-        --         return true
-        --       end
-        --     end,
-        --     additional_vim_regex_highlighting = false,
     },
 }
-
--- Disable these settings in hopes that nvim 0.11 treesitter performance improvements fix these issues
--- vim.api.nvim_create_autocmd({ "InsertEnter" },
---   {
---     pattern = "*",
---     callback = function()
---       if vim.api.nvim_buf_line_count(0) > 4000 then
---         vim.cmd("TSDisable highlight")
---       end
---     end
---   })
--- vim.api.nvim_create_autocmd({ "InsertLeave" },
---   {
---     pattern = "*",
---     callback = function()
---       if vim.api.nvim_buf_line_count(0) > 4000 then
---         vim.cmd("TSEnable highlight")
---       end
---     end
---   })
--- vim.api.nvim_create_autocmd({ "BufEnter" }, {
---   callback = function()
---     vim.cmd("TSEnable highlight")
---   end
--- })
 
 pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -252,7 +241,8 @@ vim.lsp.config.clangd = {
         "--enable-config",
         "--fallback-style=llvm",
         "--header-insertion=never",
-        "--offset-encoding=utf-16"
+        "--offset-encoding=utf-16",
+        "--compile-commands-dir=" .. "/home/i749707",
     }
 }
 vim.lsp.config.luals = {
@@ -269,19 +259,31 @@ vim.lsp.config.luals = {
 vim.lsp.config.ts_ls = {
     cmd = { "typescript-language-server", "--stdio" },
     filetypes = { "javascript", "typescript", "vue", },
-       settings = { hostInfo = "neovim" },
+    settings = { hostInfo = "neovim" },
+}
+vim.lsp.config.html_lsp = {
+    cmd = { "vscode-html-language-server", "--stdio" },
+    filetypes = { "html", "templ" },
+    init_options = {
+        configurationSection = { "html", "css", "javascript" },
+        embeddedLanguages = {
+            css = true,
+            javascript = true
+        },
+        provideFormatter = true
+    }
 }
 vim.lsp.config.perlnavigator = {
     cmd = { "perlnavigator" },
     settings = {
-      perlnavigator = {
-          perlPath = 'perl',
-          enableWarnings = true,
-          perltidyProfile = '',
-          perlcriticProfile = '',
-          perlcriticEnabled = true,
-          includePaths = { '~/perllib' },
-      }
+        perlnavigator = {
+            perlPath = 'perl',
+            enableWarnings = true,
+            perltidyProfile = '',
+            perlcriticProfile = '',
+            perlcriticEnabled = true,
+            includePaths = { '~/perllib' },
+        }
     }
 }
 
@@ -388,7 +390,7 @@ vim.lsp.config.rust_analyzer = {
     end,
 }
 
-vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "rust_analyzer" })
+vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "gopls", "rust_analyzer", "html_lsp" })
 
 local dap = require("dap")
 dap.adapters.gdb = {
@@ -411,7 +413,6 @@ dap.configurations.cpp = {
         stopAtBeginningOfMainSubprogram = false
     }
 }
-
 require("dapui").setup()
 
 -- Autocomplete (via cmp)
@@ -446,7 +447,8 @@ local kind_icons = {
 cmp.setup({
     sources = {
         { name = 'nvim_lsp' },
-        { name = "path" },
+        { name = 'path' },
+        { name = 'render-markdown' },
     },
     window = {
         -- completion = cmp.config.window.bordered(),
@@ -552,6 +554,53 @@ cmp.setup({
     },
 })
 
+-- Configure cmp completion for copilot chat
+-- Don't need this right now, but maybe active later
+--  local copilot_chat = require('CopilotChat')
+--  local source = {}
+--
+--  function source:get_trigger_characters()
+--    local info = copilot_chat.complete_info()
+--    return info['triggers']
+--  end
+--
+--  function source:get_keyword_pattern()
+--    local info = copilot_chat.complete_info()
+--    return info['pattern']
+--  end
+--
+--  function source:complete(_, callback)
+--    local items = copilot_chat.complete_items() or {}
+--    local completion_kinds = vim.lsp.protocol.CompletionItemKind
+--
+--    local mapped_items = vim.tbl_map(function(item)
+--      return {
+--        label = item.word,
+--        kind = completion_kinds[item.kind] or completion_kinds.Text,
+--        detail = item.info,
+--        documentation = item.menu,
+--      }
+--    end, items)
+--
+--    callback(mapped_items)
+--  end
+--
+--  function source:execute(completion_item, callback)
+--    callback(completion_item)
+--  end
+--
+--  cmp.register_source('copilot_chat', source)
+--
+--  cmp.setup.filetype('copilot-chat', {
+--    completion = {
+--      autocomplete = false,
+--      completeopt = table.concat(vim.opt.completeopt:get(), ","),
+--    },
+--    sources = {
+--      { name = 'copilot_chat' },
+--    },
+--  })
+
 
 -- `/` cmdline setup.
 cmp.setup.cmdline('/', {
@@ -576,11 +625,74 @@ cmp.setup.cmdline(':', {
 })
 
 -- Copilot settings
+local chat = require("CopilotChat")
+-- docs recommend this
+vim.cmd("set completeopt+=noinsert,noselect,popup")
+chat.setup({
+    --model = 'gpt-4.1',
+    --model = 'claude-sonnet-4',
+    model = 'claude-sonnet-4.5',
+    --    chat_autocomplete = false,
+    mappings = {
+        complete = {
+            insert = "<C-i>",
+            callback = function()
+                require('CopilotChat.completion').complete()
+            end,
+        },
+    },
+    history_path = '~/copilot-chat-history/',
+    window = {
+        layout = 'float',
+        width = .85,        -- Fixed width in columns
+        height = 1,         -- Fixed height in rows
+        border = 'rounded', -- 'single', 'double', 'rounded', 'solid'
+        title = 'AI chat window',
+        zindex = 2,         -- Ensure window stays on top
+    },
+    headers = {
+        user = '👤 You: ',
+        assistant = '🤖 Copilot: ',
+        tool = '🔧 Tool: ',
+    },
+    separator = '━━',
+    show_folds = false, -- Disable folding for cleaner look
+    prompts = {
+        MyCustomPrompt = {
+            prompt = 'Explain how it works.',
+            system_prompt = 'You are very good at explaining stuff',
+            mapping = '<leader>ccmc',
+            description = 'My custom prompt description',
+        },
+        Yarrr = {
+            system_prompt = 'You are fascinated by pirates, so please respond in pirate speak.',
+        },
+        NiceInstructions = {
+            system_prompt = 'You are a nice coding tutor, so please respond in a friendly and helpful manner.' ..
+                require('CopilotChat.config.prompts').COPILOT_BASE.system_prompt,
+        }
+    },
+})
+
 if GithubCopilotEnabled then
     vim.cmd("Copilot enable")
 else
     vim.cmd("Copilot disable")
 end
+-- Auto-command to customize chat buffer behavior
+vim.api.nvim_create_autocmd('BufLeave', {
+    pattern = 'copilot-*',
+    callback = function()
+        require("CopilotChat").save(vim.g.session_start_time, "~/copilot-chat-history/")
+    end,
+})
+
+vim.api.nvim_create_autocmd({ "FileType", "WinEnter" }, {
+    pattern = "copilot-chat",
+    callback = function()
+        vim.opt_local.conceallevel = 0
+    end,
+})
 
 vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
     fg = '#c4b5c4',
@@ -588,8 +700,16 @@ vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
     force = true
 })
 
--- project navigation
--- require("harpoon"):setup()
+-- better markdown rendering
+-- require('render-markdown').setup({
+--   file_types = { 'markdown', 'copilot-chat' },
+-- })
+--
+-- require('CopilotChat').setup({
+--   highlight_headers = false,
+--   separator = '---',
+--   error_header = '> [!ERROR] Error',
+-- })
 
 -- smooth scrolling
 require("cinnamon").setup()
