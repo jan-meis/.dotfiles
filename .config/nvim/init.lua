@@ -175,6 +175,21 @@ Spec = {
         opts = {
         }
     },
+    {
+      "olimorris/codecompanion.nvim",
+      version = "^18.0.0",
+      opts = {
+          extensions = {
+              spinner = {},
+          },
+      },
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-treesitter/nvim-treesitter",
+        "franco-ruggeri/codecompanion-spinner.nvim",
+      },
+    },
+
     -- {
     --     'MeanderingProgrammer/render-markdown.nvim',
     --     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
