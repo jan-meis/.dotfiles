@@ -262,7 +262,9 @@ vim.keymap.set('i', '<M-F8>', '<Plug>(copilot-dismiss)', { desc = "Dismiss copil
 vim.keymap.set('i', '<C-F9>', '<Plug>(copilot-next)', { desc = "Next copilot suggestion" })
 vim.keymap.set('i', '<M-F9>', '<Plug>(copilot-accept-word)', { desc = "Accept copilot word" })
 vim.keymap.set('i', '<M-C-F9>', '<Plug>(copilot-accept-line)', { desc = "Accept copilot line" })
-vim.keymap.set({'n', 'v'}, 'ai', ':CodeCompanion ', { desc = "Toggle Inline AI command" })
+vim.keymap.set({'n', 'v'}, '<leader>ai', '<cmd>CodeCompanionActions <cr>', { noremap = true, silent = true, desc = "Toggle AI actions" })
+vim.keymap.set({'n', 'v'}, '<leader>aa', '<cmd>CodeCompanionChat Add <cr>', { desc = "Add to AI chat" })
+vim.keymap.set({'n', 'v'}, '<leader>ap', '<cmd>CodeCompanion ', { desc = "Open inline AI prompt" })
 
 -- Quick chat keybinding
 vim.keymap.set('n', '<leader>ccq', function()

@@ -679,7 +679,7 @@ vim.cmd("set completeopt+=noinsert,noselect,popup")
 chat.setup({
     --model = 'gpt-4.1',
     --model = 'claude-sonnet-4',
-    model = 'claude-sonnet-4.5',
+    --model = 'claude-sonnet-4.5',
     --    chat_autocomplete = false,
     mappings = {
         complete = {
@@ -742,7 +742,7 @@ vim.api.nvim_create_autocmd({ "FileType", "WinEnter" }, {
     end,
 })
 
-require("codecompanion").setup({
+Codecompanion_config = {
   display = {
     chat = {
       -- Change the default icons
@@ -788,31 +788,9 @@ require("codecompanion").setup({
           opts = {},
         },
       },
-      adapter = {
-        name = "copilot",
-        model = "claude-sonnet-4.5",
-      },
-    },
-    inline = {
-      adapter = {
-        name = "copilot",
-        model = "claude-sonnet-4.5",
-      },
-    },
-    cmd = {
-      adapter = {
-        name = "copilot",
-        model = "gpt-4.1",
-      },
-    },
-    background = {
-      adapter = {
-        name = "copilot",
-        model = "gpt-4.1",
-      },
     },
   },
-})
+}
 
 vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
     fg = '#c4b5c4',
@@ -832,6 +810,7 @@ vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
 --   separator = '---',
 --   error_header = '> [!ERROR] Error',
 -- })
+
 
 -- smooth scrolling
 require("cinnamon").setup()
