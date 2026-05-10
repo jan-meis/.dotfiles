@@ -10,88 +10,6 @@ end
 function TmuxSend(command, pane)
   vim.cmd('!tmux send-keys -t ' .. pane .. ' \"' ..  command .. '" ENTER')
 end
-
-
--- coping with a german keyboard
-vim.opt.langmap = "-/_?ö[Ö{ä]Ä}"
-local german_mappings = {
-  ['ö'] = '[',
-  ['ä'] = ']',
-  ['Ö'] = '{',
-  ['Ä'] = '}',
-  -- Add more as needed
-}
-for german_char, target_char in pairs(german_mappings) do
-  vim.keymap.set('n', 'f' .. german_char, 'f' .. target_char, { desc = "Find next " .. target_char })
-  vim.keymap.set('n', 'F' .. german_char, 'F' .. target_char, { desc = "Find previous " .. target_char })
-  vim.keymap.set('n', 't' .. german_char, 't' .. target_char, { desc = "Go before next " .. target_char })
-  vim.keymap.set('n', 'T' .. german_char, 'T' .. target_char, { desc = "Go after previous " .. target_char })
-end
-
-vim.keymap.set({ "i" }, "ö", "[")
-vim.keymap.set({ "i" }, "ä", "]")
-vim.keymap.set({ "i" }, "Ö", "{")
-vim.keymap.set({ "i" }, "Ä", "}")
-vim.keymap.set({ "i" }, "ß", "\\")
-vim.keymap.set({ "n" }, "<leader>ö", "o{<CR>}<Esc>O")
-vim.keymap.set("n", "<C-a>", "<C-]>")
-vim.keymap.set("n", "öa", ":previous<CR>")
-vim.keymap.set("n", "öA", ":rewind<CR>")
-vim.keymap.set("n", "öb", ":bprevious<CR>")
-vim.keymap.set("n", "öB", ":brewind<CR>")
-vim.keymap.set("n", "öd", "<cmd>lua vim.diagnostic.jump({count=-1})<cr>", {desc = "Jump to the previous diagnostic in the current buffer"})
-vim.keymap.set("n", "öD", "<cmd>lua vim.diagnostic.jump({count=-1000})<cr>", {desc = "Jump to the first diagnostic in the current buffer"})
-vim.keymap.set("n", "öe", "<cmd>lua vim.diagnostic.jump({count=-1, severity=vim.diagnostic.severity.ERROR})<cr>", {desc = "Jump to the previous error in the current buffer"})
-vim.keymap.set("n", "öE", "<cmd>lua vim.diagnostic.jump({count=-1000, severity=vim.diagnostic.severity.ERROR})<cr>", {desc = "Jump to the first error in the current buffer"})
-vim.keymap.set("n", "öl", ":lprevious<CR>")
-vim.keymap.set("n", "öL", ":lrewind<CR>")
-vim.keymap.set("n", "öm", "[m", { desc = "Previous method start"})
-vim.keymap.set("n", "öM", "[M", { desc = "Previous method end"})
-vim.keymap.set("n", "öq", ":cprevious<CR>")
-vim.keymap.set("n", "öQ", ":crewind<CR>")
-vim.keymap.set("n", "ös", "[s", { desc = "Previous misspelled word"} )
-vim.keymap.set("n", "öt", ":tprevious<CR>")
-vim.keymap.set("n", "öT", ":trewind<CR>")
-vim.keymap.set("n", "ö%", "<Plug>(MatchitNormalMultiBackward)", {desc = "Previous unmatched group"})
-vim.keymap.set("x", "ö%", "<Plug>(MatchitVisualMultiBackward)")
-vim.keymap.set("o", "ö%", "<Plug>(MatchitOperationMultiBackward)")
-vim.keymap.set("n", "ö(", "[(")
-vim.keymap.set("n", "ö<", "[<")
-vim.keymap.set("n", "öÖ", "[{")
-vim.keymap.set("n", "öö", "[[")
-vim.keymap.set("n", "ö<C-L>", ":lpfile<CR>")
-vim.keymap.set("n", "ö<C-Q>", ":cpfile<CR>")
-vim.keymap.set("n", "ö<C-T>", ":ctprevious<CR>")
-vim.keymap.set("n", "ö<Space>", "mzO<esc>`z", { desc = "Add empty line above cursor"})
-vim.keymap.set("n", "äa", ":next<CR>")
-vim.keymap.set("n", "äA", ":last<CR>")
-vim.keymap.set("n", "äb", ":bnext<CR>")
-vim.keymap.set("n", "äB", ":blast<CR>")
-vim.keymap.set("n", "äd", "<cmd>lua vim.diagnostic.jump({count=1})<cr>", {desc = "Jump to the next diagnostic in the current buffer"})
-vim.keymap.set("n", "äD", "<cmd>lua vim.diagnostic.jump({count=1000})<cr>", {desc = "Jump to the last diagnostic in the current buffer"})
-vim.keymap.set("n", "äe", "<cmd>lua vim.diagnostic.jump({count=1, severity=vim.diagnostic.severity.ERROR})<cr>", {desc = "Jump to the next error in the current buffer"})
-vim.keymap.set("n", "äE", "<cmd>lua vim.diagnostic.jump({count=1000, severity=vim.diagnostic.severity.ERROR})<cr>", {desc = "Jump to the last error in the current buffer"})
-vim.keymap.set("n", "äl", ":lnext<CR>")
-vim.keymap.set("n", "äL", ":llast<CR>")
-vim.keymap.set("n", "äm", "]m", { desc = "Next method start"})
-vim.keymap.set("n", "äM", "]M", { desc = "Next method end"})
-vim.keymap.set("n", "äq", ":cnext<CR>")
-vim.keymap.set("n", "äQ", ":clast<CR>")
-vim.keymap.set("n", "äs", "]s", { desc = "Next misspelled word"} )
-vim.keymap.set("n", "ät", ":tnext<CR>")
-vim.keymap.set("n", "äT", ":tlast<CR>")
-vim.keymap.set("n", "ä%", "<Plug>(MatchitNormalMultiForward)", {desc = "Next unmatched group"})
-vim.keymap.set("x", "ä%", "<Plug>(MatchitVisualMultiForward)")
-vim.keymap.set("o", "ä%", "<Plug>(MatchitOperationMultiForward)")
-vim.keymap.set("n", "ä)", "])")
-vim.keymap.set("n", "ä>", "]>")
-vim.keymap.set("n", "äÄ", "]}")
-vim.keymap.set("n", "ää", "]]")
-vim.keymap.set("n", "ä<C-L>", ":lnfile<CR>")
-vim.keymap.set("n", "ä<C-Q>", ":cnfile<CR>")
-vim.keymap.set("n", "ä<C-T>", ":ctnext<CR>")
-vim.keymap.set("n", "ä<Space>", "mzo<esc>`z", { desc = "Add empty line below cursor"})
-
 -- general vim QoL improvments
 vim.keymap.set("n", "<F1>", function() local wordUnderCursor = vim.fn.expand("<cword>"); vim.cmd("tab Man " .. wordUnderCursor) end, { desc = "Get Man page for word under cursor" })
 vim.keymap.set("n", "n", "nzzzv")
@@ -178,7 +96,6 @@ vim.keymap.set("n", "<leader>q", toggleQuickfix, { desc = "Toggle quickfix list"
 vim.keymap.set("n", "<leader>w", toggleLocation, { desc = "Toggle quickfix list" })
 
 -- File explorer (directory tree)
-vim.keymap.set("n", "<leader>ft", require("nvim-tree.api").tree.toggle, { desc = "Open file explorer" })
 vim.keymap.set("n", "<space>fe", function()
   require("telescope").extensions.file_browser.file_browser()
 end, { desc = "Open file browser" })
@@ -275,14 +192,6 @@ vim.keymap.set('n', '<leader>ccq', function()
     })
   end
 end, { desc = "CopilotChat - Quick chat" })
-
--- Dap settings
-vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
-vim.keymap.set({ "n" }, "<leader><F5>", require("dapui").toggle, { desc = "Open DAP UI" })
-vim.keymap.set({ 'n', 'i' }, '<F5>', function() require('dap').continue() end, { desc = "DAP continue" })
-vim.keymap.set({ 'n', 'i' }, '<F10>', function() require('dap').step_over() end, { desc = "DAP step over" })
-vim.keymap.set({ 'n', 'i' }, '<C-F11>', function() require('dap').step_into() end, { desc = "DAP step into" })
-vim.keymap.set({ 'n', 'i' }, '<F12>', function() require('dap').step_out() end, { desc = "DAP step out" })
 
 -- treesitter-context (show function signature in top row)
 vim.keymap.set("n", "<leader>gu", function() require("treesitter-context").go_to_context(vim.v.count1) end, { silent = true, desc = "Go to function signature" })

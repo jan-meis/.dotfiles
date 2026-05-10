@@ -6,7 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out,                            "WarningMsg" },
+      { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -59,22 +59,9 @@ Spec = {
   { "mbbill/undotree" },
   -- git
   { "tpope/vim-fugitive" },
-  -- LSP auto setup
-  { 'williamboman/mason.nvim' },
-  { 'williamboman/mason-lspconfig.nvim' },
-  { 'neovim/nvim-lspconfig' },
-  { 'lucasecdb/godot-wsl-lsp' },
-  -- DAP (debug adapter protocol)
-  { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
-  -- autocomplete
-  { 'hrsh7th/cmp-nvim-lsp' },
-  { 'hrsh7th/nvim-cmp' },
-  { 'hrsh7th/cmp-cmdline' },
-  { 'hrsh7th/cmp-path'},
   -- live grep
   {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.8',
     dependencies = {
       'nvim-lua/plenary.nvim',
       'nvim-telescope/telescope-live-grep-args.nvim'
@@ -86,24 +73,7 @@ Spec = {
   },
   { 'nvim-telescope/telescope-ui-select.nvim' },
   { 'echasnovski/mini.nvim', version = '*' },
-  { 'junegunn/fzf' },
   { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-  {
-    "nvim-tree/nvim-tree.lua",
-    version = "*",
-    lazy = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("nvim-tree").setup {
-        hijack_directories = {
-          enable = false,
-          auto_open = false,
-        },
-      }
-    end,
-  },
   -- prettiier quickfix list
   { 'kevinhwang91/nvim-bqf', ft = 'qf' },
   -- key help
@@ -126,7 +96,6 @@ Spec = {
     },
   },
   -- better global marks
-  -- { "davvid/harpoon",        branch = "save-cursor-position", dependencies = { "nvim-lua/plenary.nvim" } },
     {
         "otavioschwanck/arrow.nvim",
         dependencies = {
@@ -152,28 +121,17 @@ Spec = {
   -- prttier status line
   { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
   -- save last opened file
-    {
-        'rmagatti/auto-session',
-        lazy = false,
-        ---enables autocomplete for opts
-        ---@module "auto-session"
-        ---@type AutoSession.Config
-        opts = {
-            suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
-            use_git_branch = true,
-            -- log_level = 'debug',
-        }
-    },
-    { "github/copilot.vim" },
-    {
-        "CopilotC-Nvim/CopilotChat.nvim",
-        dependencies = {
-            { "github/copilot.vim" },                       -- or zbirenbaum/copilot.lua
-            { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
-        },
-        build = "make tiktoken",                            -- Only on MacOS or Linux
-        opts = {
-        }
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+        suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+        use_git_branch = true,
+        -- log_level = 'debug',
+       }
     },
     {
       "olimorris/codecompanion.nvim",
@@ -189,15 +147,6 @@ Spec = {
         "franco-ruggeri/codecompanion-spinner.nvim",
       },
     },
-    -- {
-    --     'MeanderingProgrammer/render-markdown.nvim',
-    --     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
-    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    --     ---@module 'render-markdown'
-    --     ---@type render.md.UserConfig
-    --     opts = {},
-    -- },
 }
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_includes.lua")) then
