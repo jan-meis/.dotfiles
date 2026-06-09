@@ -23,7 +23,7 @@ if (os.getenv("mybuildpath") ~= nil) then
     Mybuildpath = os.getenv("mybuildpath")
 end
 AllowGlobalFormat = false
-GithubCopilotEnabled = true
+GithubCopilotEnabled = false
 vim.opt.spell = false
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
@@ -56,6 +56,16 @@ vim.cmd("ca G tab G")
 vim.cmd("autocmd FileType help wincmd T")
 vim.cmd("autocmd FileType * setlocal formatoptions-=o")
 vim.cmd("set completeopt+=popup")
+
+function ClearRegisters()
+  local regs = {
+    '"', "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
+  }
+  for _, r in ipairs(regs) do
+    vim.fn.setreg(r, "")
+  end
+end
 
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50"
@@ -138,12 +148,6 @@ require('lualine').setup({
     }
 })
 
--- Function signature context at the top
-ContextMaxHeight = 1
-require 'treesitter-context'.setup {
-    max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
-    trim_scope = 'inner'
-}
 
 -- Telescope (fuzzy finder)
 local lga_actions = require("telescope-live-grep-args.actions")
@@ -251,23 +255,30 @@ require('bqf.config').preview.winblend = 0
 require('bqf.config').preview.win_height = 999
 
 -- Treesitter (highlighting)
-require 'nvim-treesitter.configs'.setup {
-    -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-    ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+--require 'nvim-treesitter.config'.setup {
+--    -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+--    ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+--
+--    -- Install parsers synchronously (only applied to `ensure_installed`)
+--    sync_install = false,
+--
+--    -- Automatically install missing parsers when entering buffer
+--    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+--    auto_install = true,
+--    indent = {
+--        enable = false,
+--    },
+--
+--    highlight = {
+--        enable = true,
+--    },
+--}
 
-    -- Install parsers synchronously (only applied to `ensure_installed`)
-    sync_install = false,
-
-    -- Automatically install missing parsers when entering buffer
-    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-    auto_install = true,
-    indent = {
-        enable = false,
-    },
-
-    highlight = {
-        enable = true,
-    },
+-- Function signature context at the top
+ContextMaxHeight = 1
+require 'treesitter-context'.setup {
+    max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
+    trim_scope = 'inner'
 }
 
 pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
@@ -759,7 +770,7 @@ Codecompanion_config = {
       window = {
         layout = "float", -- float|vertical|horizontal|buffer
         width = 0.85,
-        height = 1,
+        height = .99,
         border = "rounded",
       },
     },
@@ -797,8 +808,6 @@ vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
     ctermfg = 8,
     force = true
 })
-
-
 
 -- better markdown rendering
 -- require('render-markdown').setup({

@@ -33,7 +33,20 @@ Spec = {
   -- pretty colors
   { 'rebelot/kanagawa.nvim' },
   -- fast highlighting
-  { "nvim-treesitter/nvim-treesitter",  build = ":TSUpdate" },
+{
+  "romus204/tree-sitter-manager.nvim",
+  dependencies = {}, -- tree-sitter CLI must be installed system-wide
+  config = function()
+    require("tree-sitter-manager").setup({
+      -- Default Options
+      ensure_installed = {c, cpp, go}, -- list of parsers to install at the start of a neovim session. If set to "all", install all parsers.
+      -- border = nil, -- border style for the window (e.g. "rounded", "single"), if nil, use the default border style defined by 'vim.o.winborder'. See :h 'winborder' for more info.
+      auto_install = true, -- if enabled, install missing parsers when editing a new file
+      highlight = true, -- treesitter highlighting is enabled by default
+      -- languages = {}, -- override or add new parser sources
+    })
+  end
+},
   {
       'fei6409/log-highlight.nvim',
       config = function()
@@ -74,7 +87,6 @@ Spec = {
   -- live grep
   {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.8',
     dependencies = {
       'nvim-lua/plenary.nvim',
       'nvim-telescope/telescope-live-grep-args.nvim'
@@ -177,7 +189,6 @@ Spec = {
     },
     {
       "olimorris/codecompanion.nvim",
-      version = "^18.0.0",
       opts = {
           extensions = {
               spinner = {},
@@ -185,7 +196,6 @@ Spec = {
       },
       dependencies = {
         "nvim-lua/plenary.nvim",
-        "nvim-treesitter/nvim-treesitter",
         "franco-ruggeri/codecompanion-spinner.nvim",
       },
     },

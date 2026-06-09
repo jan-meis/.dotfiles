@@ -105,6 +105,7 @@ vim.keymap.set("n", "<leader>ht", function() vim.cmd("set list!") end, { desc = 
 vim.keymap.set({ "n" }, "<leader>+", "<C-w>T", { desc = "Maximize current split" })
 vim.keymap.set({ "n" }, "<C-w>e", ":vnew | q<CR>", { desc = "Equalize vertical splits" })
 vim.keymap.set({ "n" }, "<C-w>E", ":new | q<CR>", { desc = "Equalize horizontal splits" })
+vim.keymap.set({ "n" }, "<leader>rw", ":%s/\r//g", { desc = "Equalize horizontal splits" })
 
 -- clipboard / yank / paste
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
@@ -114,6 +115,12 @@ vim.keymap.set({ "n", "v" }, "<leader>P", [["+P]], { desc = "Paste from clipboar
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
+vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
+--vim.keymap.set({ "n" }, "p", "p=ap", { noremap = true, silent = true })
+--vim.keymap.set({ "n" }, "P", "P=ap", { noremap = true, silent = true })
+vim.keymap.set({ "x" }, "p", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! p") else return vim.cmd("normal! p=ap") end end, { noremap = true, silent = true })
+vim.keymap.set({ "x" }, "P", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! P") else return vim.cmd("normal! P=ap") end end, { noremap = true, silent = true })
+
 
 -- LSP bindings
 -- Default mappings since 0.11
