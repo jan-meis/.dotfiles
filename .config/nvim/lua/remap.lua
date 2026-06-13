@@ -50,8 +50,8 @@ vim.keymap.set({ "x" }, "P", function() if vim.fn.mode() ~= "V" then return vim.
 -- gra in Normal and Visual mode maps to vim.lsp.buf.code_action()
 -- CTRL-S in Insert and Select mode maps to vim.lsp.buf.signature_help()
 vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', {  desc = "Show documentation" })
-vim.keymap.set('n', '<leader>gn', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
-vim.keymap.set('n', '<leader>gp', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', ']e', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '[e', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
 vim.keymap.set('n', '<leader>gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
 vim.keymap.set('n', '<leader>gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
 vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
@@ -192,16 +192,6 @@ vim.keymap.set({'n', 'v'}, '<leader>ai', '<cmd>CodeCompanionActions <cr>', { nor
 vim.keymap.set({'n', 'v'}, '<leader>aa', '<cmd>CodeCompanionChat Add <cr>', { desc = "Add to AI chat" })
 vim.keymap.set({'n', 'v'}, '<leader>ap', '<cmd>CodeCompanion ', { desc = "Open inline AI prompt" })
 
--- Quick chat keybinding
-vim.keymap.set('n', '<leader>ccq', function()
-  local input = vim.fn.input("Quick Chat: ")
-  if input ~= "" then
-    require("CopilotChat").ask(input, {
-      selection = require("CopilotChat.select").buffer
-    })
-  end
-end, { desc = "CopilotChat - Quick chat" })
-
 -- Dap settings
 vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
 vim.keymap.set({ "n" }, "<leader><F5>", require("dapui").toggle, { desc = "Open DAP UI" })
@@ -238,7 +228,6 @@ vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = "Find help" })
 vim.keymap.set('n', '<leader>fc',
   function()
     require("telescope.builtin").current_buffer_fuzzy_find({  fuzzy = true, case_mode = "ignore_case" })
-    vim.cmd("TSEnable highlight")
   end,
   { desc = "Find in current buffer" })
 vim.keymap.set('n', '<leader>fC',
