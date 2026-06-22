@@ -22,9 +22,8 @@ vim.keymap.set("n", "J", "mzJ`z", { desc = "Move next line up to current line" }
 vim.keymap.set("i", "<Tab>","<C-v><Tab>" , { desc = "Tab" })
 vim.keymap.set("n", "<leader>ht", function() vim.cmd("set list!") end, { desc = "Toggle tab visibility" })
 vim.keymap.set({ "n" }, "<leader>+", "<C-w>T", { desc = "Maximize current split" })
-vim.keymap.set({ "n" }, "<C-w>e", ":vnew | q<CR>", { desc = "Equalize vertical splits" })
+vim.keymap.set({ "n" }, "<C-w>e", ":vnew | q<CR>", { desc = "Equalize  splits" })
 vim.keymap.set({ "n" }, "<C-w>E", ":new | q<CR>", { desc = "Equalize horizontal splits" })
-vim.keymap.set({ "n" }, "<leader>rw", ":%s/\r//g", { desc = "Equalize horizontal splits" })
 
 -- clipboard / yank / paste
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
@@ -52,11 +51,14 @@ vim.keymap.set({ "x" }, "P", function() if vim.fn.mode() ~= "V" then return vim.
 vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', {  desc = "Show documentation" })
 vim.keymap.set('n', ']e', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
 vim.keymap.set('n', '[e', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<cr>', { desc = "Go to next diagnostic" })
-vim.keymap.set('n', '<leader>gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
-vim.keymap.set('n', '<leader>gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
-vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
-vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
-vim.keymap.set('n', '<leader>go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', { desc = "Type definition" })
+vim.keymap.set('n', 'grd', '<cmd>lua vim.lsp.buf.definition()<cr>', {  desc = "Go to definition" })
+vim.keymap.set('n', 'grD', '<cmd>lua vim.lsp.buf.declaration()<cr>', {  desc = "Go to declaration" })
+vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>', { desc = "Open diagnostic" })
+ vim.keymap.set('i', '<F9>', function()
+  if not vim.lsp.inline_completion.get() then
+    return '<F9>'
+  end
+end, { expr = true, desc = 'Accept the current inline completion' })
 vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
     function()
         if vim.api.nvim_get_mode().mode == 'n' then
@@ -67,7 +69,6 @@ vim.keymap.set({ 'n', 'x', 'v' }, '<F3>',
             vim.lsp.buf.format({ async = true })
         end
     end, { desc = "Format buffer" })
-vim.keymap.set('n', '<leader>o', '<cmd>lua vim.diagnostic.open_float()<cr>', { desc = "Open diagnostic" })
 vim.keymap.set('n', '<leader>sqf', '<cmd>lua vim.diagnostic.setqflist()<cr>', { desc = "Set quickfix list" })
 
 -- nvim-bqf (better quickfix list)
@@ -180,7 +181,7 @@ vim.keymap.set({ 'n', 'i' }, '<C-F7>',
     vim.cmd("Copilot disable")
   end, { desc = "Copilot toggle" })
 vim.keymap.set('i', '<F8>', '<Plug>(copilot-suggest)', { desc = "Suggest copilot completion" })
-vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false, desc = "Accept copilot completion" })
+--vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false, desc = "Accept copilot completion" })
 -- vim.keymap.set({'n'}, '<F7>', ':CopilotChatToggle<CR>', { desc = "Toggle Copilot Chat" })
 vim.keymap.set({'n'}, '<F7>', ':CodeCompanionChat toggle<CR>', { desc = "Toggle Copilot Chat" })
 vim.keymap.set('i', '<C-F8>', '<Plug>(copilot-previous)', { desc = "Previous copilot suggestion" })
@@ -190,7 +191,7 @@ vim.keymap.set('i', '<M-F9>', '<Plug>(copilot-accept-word)', { desc = "Accept co
 vim.keymap.set('i', '<M-C-F9>', '<Plug>(copilot-accept-line)', { desc = "Accept copilot line" })
 vim.keymap.set({'n', 'v'}, '<leader>ai', '<cmd>CodeCompanionActions <cr>', { noremap = true, silent = true, desc = "Toggle AI actions" })
 vim.keymap.set({'n', 'v'}, '<leader>aa', '<cmd>CodeCompanionChat Add <cr>', { desc = "Add to AI chat" })
-vim.keymap.set({'n', 'v'}, '<leader>ap', '<cmd>CodeCompanion ', { desc = "Open inline AI prompt" })
+vim.keymap.set({'n', 'v'}, '<leader>ap', '<cmd>CodeCompanion<cr>', { desc = "Open inline AI prompt" })
 
 -- Dap settings
 vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
@@ -255,7 +256,7 @@ function RunAsyncCommand(command)
 end
 
 -- fugitive (git)
--- vim.keymap.set("n", "<leader>gs", ":! git add . && (git diff HEAD | git commit -F -) && git push ccde<CR>", { desc = "git sync with ccde && windows" })
+vim.keymap.set("n", "<leader>gv", ":tab Gvdiffsplit!<CR>", { desc = "Open three-way split in new tab" })
 vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit --allow-empty && git push ccde -f<CR>", { desc = "git sync ammended commit with ccde" })
 vim.keymap.set("n", "<leader>gm", function() RunAsyncCommand("git add . && git commit --amend --no-edit --allow-empty && git push ccde -f && tmux send-keys -t 1 ENTER \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER") end, { desc = "git sync and make on ccde" })
 vim.keymap.set("n", "<leader>rs",
@@ -269,32 +270,42 @@ vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTE
 vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "git ammend commit message" })
 vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "git create new commit" })
 vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
-vim.keymap.set("n", "<leader>gt", function()
-    local handle = io.popen("git diff --name-only @{u}...HEAD 2>/dev/null")
-    if not handle then
-        print("Error: Could not execute git command")
-        return
-    end
-    local result = handle:read("*a")
-    handle:close()
-    -- Split the result into lines and filter out empty ones
-    local filenames = {}
-    for filename in result:gmatch("[^\r\n]+") do
-        if filename ~= "" and vim.fn.filereadable(filename) == 1 then
-            table.insert(filenames, filename)
-        end
-    end
-    -- Open each file in a new tab
-    for _, filename in ipairs(filenames) do
-        vim.cmd("tabnew " .. vim.fn.fnameescape(filename))
-        vim.cmd("Gvdiffsplit @{u}...HEAD")
-    end
-    if #filenames == 0 then
-        print("No modified files found or files are not readable")
-    else
-        print("Opened " .. #filenames .. " files in new tabs")
-    end
-end, { desc = "Open Git diff split on all changed files" })
+vim.api.nvim_create_autocmd("User", {
+    pattern = "FugitiveIndex",
+    callback = function(args)
+        vim.keymap.set("n", "dt", ":Gtabedit <Plug><cfile><Bar>Gvdiffsplit!<CR>", {
+            buffer = args.buf,
+            remap = true, -- needed so <Plug> mappings can expand
+            silent = true,
+        })
+    end,
+})
+--vim.keymap.set("n", "<leader>gT", function()
+    --    local handle = io.popen("git diff --name-only @{u}...HEAD 2>/dev/null")
+    --    if not handle then
+    --        print("Error: Could not execute git command")
+    --        return
+    --    end
+    --    local result = handle:read("*a")
+    --    handle:close()
+    --    -- Split the result into lines and filter out empty ones
+    --    local filenames = {}
+    --    for filename in result:gmatch("[^\r\n]+") do
+    --        if filename ~= "" and vim.fn.filereadable(filename) == 1 then
+    --            table.insert(filenames, filename)
+    --        end
+    --    end
+    --    -- Open each file in a new tab
+    --    for _, filename in ipairs(filenames) do
+    --        vim.cmd("tabnew " .. vim.fn.fnameescape(filename))
+    --        vim.cmd("Gvdiffsplit @{u}...HEAD")
+    --    end
+    --    if #filenames == 0 then
+    --        print("No modified files found or files are not readable")
+    --    else
+    --        print("Opened " .. #filenames .. " files in new tabs")
+    --    end
+    --end, { desc = "Open Git diff split on all changed files" })
 
 
 -- QoL for remote work

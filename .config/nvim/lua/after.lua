@@ -23,7 +23,7 @@ if (os.getenv("mybuildpath") ~= nil) then
     Mybuildpath = os.getenv("mybuildpath")
 end
 AllowGlobalFormat = false
-GithubCopilotEnabled = false
+GithubCopilotEnabled = true 
 vim.opt.spell = false
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
@@ -92,58 +92,59 @@ local function isRecording()
     return "recording to " .. reg
 end
 
-local CodeCompanionStatus = require("lualine.component"):extend()
-
-CodeCompanionStatus.processing = false
-CodeCompanionStatus.spinner_index = 1
-
-local spinner_symbols = {
-  "⠋",
-  "⠙",
-  "⠹",
-  "⠸",
-  "⠼",
-  "⠴",
-  "⠦",
-  "⠧",
-  "⠇",
-  "⠏",
-}
-local spinner_symbols_len = 10
-
--- Initializer
-function CodeCompanionStatus:init(options)
-  CodeCompanionStatus.super.init(self, options)
-
-  local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
-
-  vim.api.nvim_create_autocmd({ "User" }, {
-    pattern = "CodeCompanionRequest*",
-    group = group,
-    callback = function(request)
-      if request.match == "CodeCompanionRequestStarted" then
-        self.processing = true
-      elseif request.match == "CodeCompanionRequestFinished" then
-        self.processing = false
-      end
-    end,
-  })
-end
-
--- Function that runs every time statusline is updated
-function CodeCompanionStatus:update_status()
-  if self.processing then
-    self.spinner_index = (self.spinner_index % spinner_symbols_len) + 1
-    return spinner_symbols[self.spinner_index]
-  else
-    return nil
-  end
-end
+--local CodeCompanionStatus = require("lualine.component"):extend()
+--
+--CodeCompanionStatus.processing = false
+--CodeCompanionStatus.spinner_index = 1
+--
+--local spinner_symbols = {
+--  "⠋",
+--  "⠙",
+--  "⠹",
+--  "⠸",
+--  "⠼",
+--  "⠴",
+--  "⠦",
+--  "⠧",
+--  "⠇",
+--  "⠏",
+--}
+--local spinner_symbols_len = 10
+--
+---- Initializer
+--function CodeCompanionStatus:init(options)
+--  CodeCompanionStatus.super.init(self, options)
+--
+--  local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
+--
+--  vim.api.nvim_create_autocmd({ "User" }, {
+--    pattern = "CodeCompanionRequest*",
+--    group = group,
+--    callback = function(request)
+--      if request.match == "CodeCompanionRequestStarted" then
+--        self.processing = true
+--      elseif request.match == "CodeCompanionRequestFinished" then
+--        self.processing = false
+--      end
+--    end,
+--  })
+--end
+--
+---- Function that runs every time statusline is updated
+--function CodeCompanionStatus:update_status()
+--  if self.processing then
+--    self.spinner_index = (self.spinner_index % spinner_symbols_len) + 1
+--    return spinner_symbols[self.spinner_index]
+--  else
+--    return nil
+--  end
+--end
 
 require('lualine').setup({
     sections = {
         lualine_c = { { 'filename', path = 1 }, { function() return statusline.text_for_statusline_with_icons() end }, { isRecording } },
-        lualine_z = { "location", { selectionCount }, { CodeCompanionStatus },
+        lualine_z = { "location", { selectionCount },
+--        { CodeCompanionStatus },
         },
     }
 })
@@ -613,53 +614,6 @@ cmp.setup({
     },
 })
 
--- Configure cmp completion for copilot chat
--- Don't need this right now, but maybe active later
---  local copilot_chat = require('CopilotChat')
---  local source = {}
---
---  function source:get_trigger_characters()
---    local info = copilot_chat.complete_info()
---    return info['triggers']
---  end
---
---  function source:get_keyword_pattern()
---    local info = copilot_chat.complete_info()
---    return info['pattern']
---  end
---
---  function source:complete(_, callback)
---    local items = copilot_chat.complete_items() or {}
---    local completion_kinds = vim.lsp.protocol.CompletionItemKind
---
---    local mapped_items = vim.tbl_map(function(item)
---      return {
---        label = item.word,
---        kind = completion_kinds[item.kind] or completion_kinds.Text,
---        detail = item.info,
---        documentation = item.menu,
---      }
---    end, items)
---
---    callback(mapped_items)
---  end
---
---  function source:execute(completion_item, callback)
---    callback(completion_item)
---  end
---
---  cmp.register_source('copilot_chat', source)
---
---  cmp.setup.filetype('copilot-chat', {
---    completion = {
---      autocomplete = false,
---      completeopt = table.concat(vim.opt.completeopt:get(), ","),
---    },
---    sources = {
---      { name = 'copilot_chat' },
---    },
---  })
-
 
 -- `/` cmdline setup.
 cmp.setup.cmdline('/', {
@@ -684,75 +638,15 @@ cmp.setup.cmdline(':', {
 })
 
 -- Copilot settings
-local chat = require("CopilotChat")
--- docs recommend this
-vim.cmd("set completeopt+=noinsert,noselect,popup")
-chat.setup({
-    --model = 'gpt-4.1',
-    --model = 'claude-sonnet-4',
-    --model = 'claude-sonnet-4.5',
-    --    chat_autocomplete = false,
-    mappings = {
-        complete = {
-            insert = "<C-i>",
-            callback = function()
-                require('CopilotChat.completion').complete()
-            end,
-        },
-    },
-    history_path = '~/copilot-chat-history/',
-    window = {
-        layout = 'float',
-        width = .85,        -- Fixed width in columns
-        height = 1,         -- Fixed height in rows
-        border = 'rounded', -- 'single', 'double', 'rounded', 'solid'
-        title = 'AI chat window',
-        zindex = 2,         -- Ensure window stays on top
-    },
-    headers = {
-        user = '👤 You: ',
-        assistant = '🤖 Copilot: ',
-        tool = '🔧 Tool: ',
-    },
-    separator = '━━',
-    show_folds = false, -- Disable folding for cleaner look
-    prompts = {
-        MyCustomPrompt = {
-            prompt = 'Explain how it works.',
-            system_prompt = 'You are very good at explaining stuff',
-            mapping = '<leader>ccmc',
-            description = 'My custom prompt description',
-        },
-        Yarrr = {
-            system_prompt = 'You are fascinated by pirates, so please respond in pirate speak.',
-        },
-        NiceInstructions = {
-            system_prompt = 'You are a nice coding tutor, so please respond in a friendly and helpful manner.' ..
-                require('CopilotChat.config.prompts').COPILOT_BASE.system_prompt,
-        }
-    },
-})
-
 if GithubCopilotEnabled then
     vim.cmd("Copilot enable")
 else
     vim.cmd("Copilot disable")
 end
--- Auto-command to customize chat buffer behavior
-vim.api.nvim_create_autocmd('BufLeave', {
-    pattern = 'copilot-*',
-    callback = function()
-        require("CopilotChat").save(vim.g.session_start_time, "~/copilot-chat-history/")
-    end,
-})
+vim.lsp.inline_completion.enable(true)
 
-vim.api.nvim_create_autocmd({ "FileType", "WinEnter" }, {
-    pattern = "copilot-chat",
-    callback = function()
-        vim.opt_local.conceallevel = 0
-    end,
-})
 
+-- CodeCompanion settings
 Codecompanion_config = {
   display = {
     chat = {
@@ -776,31 +670,16 @@ Codecompanion_config = {
     },
   },
   interactions = {
-    chat = {
-      keymaps = {
-        next_chat  = {
-          modes = { n = "Ä" },
-          opts = {},
-        },
-        previous_chat  = {
-          modes = { n = "Ö" },
-          opts = {},
-        },
-        next_header   = {
-          modes = { n = "ää" },
-          opts = {},
-        },
-        previous_header   = {
-          modes = { n = "öö" },
-          opts = {},
-        },
-        fold_code = {
-          modes = { n = "gu" },
-          opts = {},
-        },
-      },
+      chat = {},
     },
-  },
+  extensions = {
+    history = {
+      enabled = true, -- defaults to true
+      opts = {
+        dir_to_save = vim.fn.stdpath("data") .. "/codecompanion_chats.json",
+      }
+    }
+  }
 }
 
 vim.api.nvim_set_hl(0, 'CopilotSuggestion', {

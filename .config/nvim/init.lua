@@ -178,25 +178,17 @@ Spec = {
     },
     { "github/copilot.vim" },
     {
-        "CopilotC-Nvim/CopilotChat.nvim",
-        dependencies = {
-            { "github/copilot.vim" },                       -- or zbirenbaum/copilot.lua
-            { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
-        },
-        build = "make tiktoken",                            -- Only on MacOS or Linux
-        opts = {
-        }
-    },
-    {
       "olimorris/codecompanion.nvim",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "franco-ruggeri/codecompanion-spinner.nvim",
+        "ravitemer/codecompanion-history.nvim", -- history extension
+        "agentclientprotocol/claude-agent-acp"
+      },
       opts = {
           extensions = {
               spinner = {},
           },
-      },
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-        "franco-ruggeri/codecompanion-spinner.nvim",
       },
     },
     -- {
