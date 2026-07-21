@@ -36,8 +36,8 @@ vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 vim.keymap.set({ "n", "v" }, "x", [["_x]], { desc = "Delete to void register" })
 --vim.keymap.set({ "n" }, "p", "p=ap", { noremap = true, silent = true })
 --vim.keymap.set({ "n" }, "P", "P=ap", { noremap = true, silent = true })
-vim.keymap.set({ "x" }, "p", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! p") else return vim.cmd("normal! p=ap") end end, { noremap = true, silent = true })
-vim.keymap.set({ "x" }, "P", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! P") else return vim.cmd("normal! P=ap") end end, { noremap = true, silent = true })
+--vim.keymap.set({ "x" }, "p", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! p") else return vim.cmd("normal! p=ap") end end, { noremap = true, silent = true })
+--vim.keymap.set({ "x" }, "P", function() if vim.fn.mode() ~= "V" then return vim.cmd("normal! P") else return vim.cmd("normal! P=ap") end end, { noremap = true, silent = true })
 
 
 -- LSP bindings
@@ -215,7 +215,7 @@ end, { desc = "Increase context line height" })
 -- Telescope
 local tb = require('telescope.builtin')
 local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
-vim.keymap.set('n', '<leader>ff', tb.find_files, { desc = "Find files" })
+vim.keymap.set('n', '<leader>ff', function() tb.find_files({no_ignore = true}) end , { desc = "Find files" })
 vim.keymap.set('n', '<leader>fr', tb.resume, { desc = "Resume telescope search" })
 vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_cursor, { desc = "Find word under cursor" })
 vim.keymap.set({'n', 'v'}, '<leader>fi', function() live_grep_args_shortcuts.grep_word_under_cursor({ postfix = "", quote = false }) end, { desc = "Find word in visual selection" })

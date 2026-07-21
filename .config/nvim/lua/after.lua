@@ -22,7 +22,7 @@ end
 if (os.getenv("mybuildpath") ~= nil) then
     Mybuildpath = os.getenv("mybuildpath")
 end
-AllowGlobalFormat = false
+AllowGlobalFormat = true
 GithubCopilotEnabled = true 
 vim.opt.spell = false
 vim.g.netrw_altfile = 1
@@ -33,8 +33,8 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.cmdheight = 0
 vim.opt.expandtab = true
-vim.opt.list = true
-vim.opt.listchars = "tab:>-"
+--vim.opt.list = true
+--vim.opt.listchars = "tab:>-"
 vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
@@ -216,13 +216,8 @@ require("telescope").setup {
                     ["<C-k>"] = lga_actions.quote_prompt(),
                     ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
                     ["<C-i>"] = lga_actions.quote_prompt({ postfix =
-                    " --iglob krn/si/ic/*.{c,cpp,h} \z
-            --iglob krn/si/ic/include/*.{h} \z
-            --iglob krn/si/include/{ic}*.{h} \z
-            --iglob krn/ict/*.{c,cpp,h} \z
-            --iglob krn/include/{ic}*.{h} \z
-            --iglob base/ni/*.{c,cpp,h} \z
-            --iglob include/{ni,si,ic}*.{h}" }),
+                    " --iglob a \z
+            --iglob b.{h}" }),
                     -- freeze the current list and start a fuzzy search in the frozen list
                     ["<C-Space>"] = actions.to_fuzzy_refine,
                 },
@@ -450,7 +445,14 @@ vim.lsp.config.rust_analyzer = {
     end,
 }
 
-vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "gopls", "rust_analyzer", "html_lsp" })
+vim.lsp.config.bash = {
+    cmd = { "bash-language-server", "start" },
+    filetypes = { "bash", "sh" },
+    root_markers = { ".git" },
+    settings = { bashIde = { globPattern = "*@(.sh|.inc|.bash|.command)" } }
+}
+
+vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "gopls", "rust_analyzer", "html_lsp", "bash" })
 
 local dap = require("dap")
 dap.adapters.gdb = {
