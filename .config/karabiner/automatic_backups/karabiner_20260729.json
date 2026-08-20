@@ -1,0 +1,78 @@
+{
+    "profiles": [
+        {
+            "devices": [
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 35,
+                        "vendor_id": 1130
+                    },
+                    "simple_modifications": [
+                        {
+                            "from": { "key_code": "left_command" },
+                            "to": [{ "key_code": "left_option" }]
+                        },
+                        {
+                            "from": { "key_code": "left_option" },
+                            "to": [{ "key_code": "left_command" }]
+                        }
+                    ]
+                }
+            ],
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Option+1-6: Launch apps",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "1", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a Ghostty" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "2", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a 'Google Chrome'" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "3", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a Notes" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "4", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a GoLand" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "5", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a Slack" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "6", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a 'Microsoft Outlook'" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "7", "modifiers": { "mandatory": ["option"], "optional": ["any"] } },
+                                "to": [{ "shell_command": "open -a 'Microsoft Teams'" }]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "name": "Default profile",
+            "selected": true,
+            "simple_modifications": [
+                {
+                    "from": { "key_code": "caps_lock" },
+                    "to": [{ "key_code": "f13" }]
+                }
+            ],
+            "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
+        }
+    ]
+}

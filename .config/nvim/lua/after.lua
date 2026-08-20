@@ -1,3 +1,5 @@
+vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
+
 -- Globals
 local function generate_session_guid()
     local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
@@ -23,7 +25,7 @@ if (os.getenv("mybuildpath") ~= nil) then
     Mybuildpath = os.getenv("mybuildpath")
 end
 AllowGlobalFormat = true
-GithubCopilotEnabled = true 
+GithubCopilotEnabled = true
 vim.opt.spell = false
 vim.g.netrw_altfile = 1
 vim.opt.nu = true
@@ -33,10 +35,15 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.cmdheight = 0
 vim.opt.expandtab = true
---vim.opt.list = true
---vim.opt.listchars = "tab:>-"
 vim.opt.smartindent = true
-vim.opt.wrap = false
+
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakindent = true
+-- pad breakindent so the arrows sit under the text, then a run of arrows
+vim.opt.breakindentopt ='shift:-2'  -- or 'sbr'
+vim.opt.showbreak = '↳↳'
+
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.ignorecase = true
@@ -44,27 +51,51 @@ vim.opt.undofile = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.termguicolors = true
+vim.opt.foldmethod = "indent"
+vim.opt.foldlevel = 99
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "160"
 vim.opt.signcolumn = 'yes'
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
---vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.g.undotree_SetFocusWhenToggle = 1
+require('kanagawa').setup({
+  overrides = function(colors)
+    return {
+      NonText = { fg = '#b0b0b0' },
+      CopilotSuggestion = { fg = '#7f848e', italic = true },
+      ComplHint = { fg = '#7f848e', italic = true },
+    }
+  end,
+})
 vim.cmd("colorscheme kanagawa-wave")
-vim.cmd("ca G tab G")
+vim.api.nvim_set_hl(0, "BookmarkHighlight", {
+    bg = "#1f1f28",
+    underline = false
+})
+
 vim.cmd("autocmd FileType help wincmd T")
 vim.cmd("autocmd FileType * setlocal formatoptions-=o")
 vim.cmd("set completeopt+=popup")
+vim.cmd("set diffopt+=vertical")
+vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function()
+        local dir = vim.fn.expand("<afile>:p:h")
+        if vim.fn.isdirectory(dir) == 0 then
+            vim.fn.mkdir(dir, "p")
+        end
+    end,
+})
 
 function ClearRegisters()
-  local regs = {
-    '"', "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
-  }
-  for _, r in ipairs(regs) do
-    vim.fn.setreg(r, "")
-  end
+    local regs = {
+        '"', "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w",
+        "x", "y", "z",
+    }
+    for _, r in ipairs(regs) do
+        vim.fn.setreg(r, "")
+    end
 end
 
 -- set cursor color and put autocmd to reset blinking cursor when leaving vim
@@ -76,218 +107,188 @@ vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/init.lua")
 vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/after.lua")), "A", 1, 1, {})
 vim.api.nvim_buf_set_mark(vim.fn.bufadd(vim.fn.expand("~/.config/nvim/lua/remap.lua")), "R", 1, 1, {})
 
--- Lualine statusbar settings
-local statusline = require('arrow.statusline') -- for arrow.nvim in statusline
-local function selectionCount()
-    local isVisualMode = vim.fn.mode():find("[Vv]")
-    if not isVisualMode then return "" end
-    local starts = vim.fn.line("v")
-    local ends = vim.fn.line(".")
-    local lines = starts <= ends and ends - starts + 1 or starts - ends + 1
-    return "/ " .. tostring(lines) .. "L " .. tostring(vim.fn.wordcount().visual_chars) .. "C"
-end
-local function isRecording()
-    local reg = vim.fn.reg_recording()
-    if reg == "" then return "" end -- not recording
-    return "recording to " .. reg
-end
+-- Defer heavy plugin setup until after the UI is visible
+vim.api.nvim_create_autocmd("User", {
+    pattern = "VeryLazy",
+    once = true,
+    callback = function()
+        local statusline = require('arrow.statusline')
 
---local CodeCompanionStatus = require("lualine.component"):extend()
---
---CodeCompanionStatus.processing = false
---CodeCompanionStatus.spinner_index = 1
---
---local spinner_symbols = {
---  "⠋",
---  "⠙",
---  "⠹",
---  "⠸",
---  "⠼",
---  "⠴",
---  "⠦",
---  "⠧",
---  "⠇",
---  "⠏",
---}
---local spinner_symbols_len = 10
---
----- Initializer
---function CodeCompanionStatus:init(options)
---  CodeCompanionStatus.super.init(self, options)
---
---  local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
---
---  vim.api.nvim_create_autocmd({ "User" }, {
---    pattern = "CodeCompanionRequest*",
---    group = group,
---    callback = function(request)
---      if request.match == "CodeCompanionRequestStarted" then
---        self.processing = true
---      elseif request.match == "CodeCompanionRequestFinished" then
---        self.processing = false
---      end
---    end,
---  })
---end
---
----- Function that runs every time statusline is updated
---function CodeCompanionStatus:update_status()
---  if self.processing then
---    self.spinner_index = (self.spinner_index % spinner_symbols_len) + 1
---    return spinner_symbols[self.spinner_index]
---  else
---    return nil
---  end
---end
+          require("bookmarks").setup({
+              -- your configuration comes here
+              -- or leave empty to use defaults
+              default_mappings = true,
+              db_path = vim.fn.stdpath('data') .. '/bookmarks.db'
+          })
+        local function selectionCount()
+            local isVisualMode = vim.fn.mode():find("[Vv]")
+            if not isVisualMode then return "" end
+            local starts = vim.fn.line("v")
+            local ends = vim.fn.line(".")
+            local lines = starts <= ends and ends - starts + 1 or starts - ends + 1
+            return "/ " .. tostring(lines) .. "L " .. tostring(vim.fn.wordcount().visual_chars) .. "C"
+        end
+        local function isRecording()
+            local reg = vim.fn.reg_recording()
+            if reg == "" then return "" end
+            return "recording to " .. reg
+        end
+        -- Hard-cap the branch name so a long branch never steals room from the
+        -- file path. lualine trims low-priority sections first when space runs
+        -- out; capping the branch here keeps the path (section c) readable.
+        local BRANCH_MAX = 20
+        local function truncate_branch(name)
+            if name == nil or name == "" then return name end
+            if vim.fn.strchars(name) > BRANCH_MAX then
+                return vim.fn.strcharpart(name, 0, BRANCH_MAX - 1) .. "…"
+            end
+            return name
+        end
 
-require('lualine').setup({
-    sections = {
-        lualine_c = { { 'filename', path = 1 }, { function() return statusline.text_for_statusline_with_icons() end }, { isRecording } },
-        lualine_z = { "location", { selectionCount },
---        { CodeCompanionStatus },
-        },
-    }
+        require('lualine').setup({
+            sections = {
+                lualine_b = {
+                    { 'branch', fmt = truncate_branch },
+                    'diff',
+                    'diagnostics',
+                },
+                -- Give the file path priority: high shorting_target keeps lualine
+                -- from truncating it early, and path = 1 shows the relative path.
+                lualine_c = {
+                    { 'filename', path = 1, shorting_target = 0 },
+                    { { function() return require('bookmarks').status() end } },
+                    { isRecording },
+                },
+                lualine_z = { "location", { selectionCount } },
+            }
+        })
+
+        -- Function signature context at the top
+        ContextMaxHeight = 1
+        require 'treesitter-context'.setup {
+            max_lines = ContextMaxHeight,
+            trim_scope = 'inner'
+        }
+    end
 })
 
-
--- Telescope (fuzzy finder)
-local lga_actions = require("telescope-live-grep-args.actions")
-local actions = require("telescope.actions")
-require("telescope").setup {
-    defaults = {
-        layout_config = {
-            width = { padding = 1 }
-        },
-        mappings = {
-            i = {
-                -- map actions.which_key to <C-h> (default: <C-/>)
-                -- actions.which_key shows the mappings for your picker,
-                -- e.g. git_{create, delete, ...}_branch for the git_branches picker
-                ["<C-h>"] = "which_key",
-                -- This replaces nvim_buf_delete with vim.cmd("bd ") to avoid global marks being deleted
-                ["<c-d>"] = function(prompt_bufnr)
-                    local action_state = require "telescope.actions.state"
-                    local current_picker = action_state.get_current_picker(prompt_bufnr)
-
-                    current_picker:delete_selection(function(selection)
-                        local _ = vim.api.nvim_buf_get_option(selection.bufnr, "buftype") == "terminal"
-                        local ok = pcall(function() vim.cmd("bd " .. selection.bufnr) end)
-
-                        -- If the current buffer is deleted, switch to the previous buffer
-                        -- according to bdelete behavior
-                        if ok and selection.bufnr == current_picker.original_bufnr then
-                            if vim.api.nvim_win_is_valid(current_picker.original_win_id) then
-                                local jumplist = vim.fn.getjumplist(current_picker.original_win_id)[1]
-                                for i = #jumplist, 1, -1 do
-                                    if jumplist[i].bufnr ~= selection.bufnr and vim.fn.bufloaded(jumplist[i].bufnr) == 1 then
-                                        vim.api.nvim_win_set_buf(current_picker.original_win_id, jumplist[i].bufnr)
-                                        current_picker.original_bufnr = jumplist[i].bufnr
-                                        return ok
-                                    end
-                                end
-                                -- no more valid buffers in jumplist, create an empty buffer
-                                local empty_buf = vim.api.nvim_create_buf(true, true)
-                                vim.api.nvim_win_set_buf(current_picker.original_win_id, empty_buf)
-                                current_picker.original_bufnr = empty_buf
-                                vim.api.nvim_buf_delete(selection.bufnr, { force = true })
-                                return ok
-                            end
-
-                            -- window of the selected buffer got wiped, switch to first valid window
-                            local win_id = vim.fn.win_getid(1, current_picker.original_tabpage)
-                            current_picker.original_win_id = win_id
-                            current_picker.original_bufnr = vim.api.nvim_win_get_buf(win_id)
-                        end
-                        return ok
-                    end)
-                end,
-            }
-        }
-    },
-    extensions = {
-        file_browser = {
-            hidden = { file_browser = true, folder_browser = true },
-        },
-        live_grep_args = {
-            auto_quoting = true, -- enable/disable auto-quoting
-            -- define mappings, e.g.
-            mappings = {         -- extend mappings
+-- Telescope configuration. Defined as a global (like Codecompanion_config) and
+-- called from telescope.nvim's lazy `config` in init.lua, so telescope loads on
+-- first use (a keymap require) rather than eagerly at startup. Also wires
+-- mini.pick as vim.ui.select and bqf preview options, both wanted on first pick.
+function Telescope_setup()
+    local lga_actions = require("telescope-live-grep-args.actions")
+    local actions = require("telescope.actions")
+    require("telescope").setup {
+        defaults = {
+            layout_config = {
+                width = { padding = 1 },
+                height = { padding = 1 },
+            },
+            mappings = {
                 i = {
-                    ["<C-k>"] = lga_actions.quote_prompt(),
-                    ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-                    ["<C-i>"] = lga_actions.quote_prompt({ postfix =
-                    " --iglob a \z
-            --iglob b.{h}" }),
-                    -- freeze the current list and start a fuzzy search in the frozen list
-                    ["<C-Space>"] = actions.to_fuzzy_refine,
+                    ["<C-h>"] = "which_key",
+                    -- replaces nvim_buf_delete with vim.cmd("bd") to avoid global marks being deleted
+                    ["<c-d>"] = function(prompt_bufnr)
+                        local action_state = require "telescope.actions.state"
+                        local current_picker = action_state.get_current_picker(prompt_bufnr)
+
+                        current_picker:delete_selection(function(selection)
+                            local _ = vim.api.nvim_buf_get_option(selection.bufnr, "buftype") == "terminal"
+                            local ok = pcall(function() vim.cmd("bd " .. selection.bufnr) end)
+
+                            if ok and selection.bufnr == current_picker.original_bufnr then
+                                if vim.api.nvim_win_is_valid(current_picker.original_win_id) then
+                                    local jumplist = vim.fn.getjumplist(current_picker.original_win_id)[1]
+                                    for i = #jumplist, 1, -1 do
+                                        if jumplist[i].bufnr ~= selection.bufnr and vim.fn.bufloaded(jumplist[i].bufnr) == 1 then
+                                            vim.api.nvim_win_set_buf(current_picker.original_win_id,
+                                                jumplist[i].bufnr)
+                                            current_picker.original_bufnr = jumplist[i].bufnr
+                                            return ok
+                                        end
+                                    end
+                                    local empty_buf = vim.api.nvim_create_buf(true, true)
+                                    vim.api.nvim_win_set_buf(current_picker.original_win_id, empty_buf)
+                                    current_picker.original_bufnr = empty_buf
+                                    vim.api.nvim_buf_delete(selection.bufnr, { force = true })
+                                    return ok
+                                end
+
+                                local win_id = vim.fn.win_getid(1, current_picker.original_tabpage)
+                                current_picker.original_win_id = win_id
+                                current_picker.original_bufnr = vim.api.nvim_win_get_buf(win_id)
+                            end
+                            return ok
+                        end)
+                    end,
+                }
+            }
+        },
+        extensions = {
+            file_browser = {
+                hidden = { file_browser = true, folder_browser = true },
+            },
+            live_grep_args = {
+                auto_quoting = true,
+                mappings = {
+                    i = {
+                        ["<C-k>"] = lga_actions.quote_prompt(),
+                        ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+                        ["<C-i>"] = lga_actions.quote_prompt({ postfix =
+                        " --iglob a \z
+                    --iglob b.{h}" }),
+                        ["<C-Space>"] = actions.to_fuzzy_refine,
+                    },
                 },
             },
         },
-    },
-}
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('live_grep_args')
-require('telescope').load_extension('file_browser')
---require("telescope").load_extension('ui-select')
--- replace telescop ui select with minipick because its buggy
-local win_config = function()
-    local height = math.floor(0.618 * vim.o.lines)
-    local width = math.floor(0.618 * vim.o.columns)
-    return {
-        anchor = 'NW',
-        height = height,
-        width = width,
-        row = math.floor(0.5 * (vim.o.lines - height)),
-        col = math.floor(0.5 * (vim.o.columns - width)),
     }
+    require('telescope').load_extension('fzf')
+    require('telescope').load_extension('live_grep_args')
+    require('telescope').load_extension('file_browser')
+
+    -- replace telescope ui-select with mini.pick
+    local win_config = function()
+        local height = math.floor(0.618 * vim.o.lines)
+        local width = math.floor(0.618 * vim.o.columns)
+        return {
+            anchor = 'NW',
+            height = height,
+            width = width,
+            row = math.floor(0.5 * (vim.o.lines - height)),
+            col = math.floor(0.5 * (vim.o.columns - width)),
+        }
+    end
+    require('mini.pick').setup({
+        window = { config = win_config },
+    })
+    vim.ui.select = require('mini.pick').ui_select
+
+    -- Better quickfix
+    require('bqf.config').preview.winblend = 0
+    require('bqf.config').preview.win_height = 999
 end
-require('mini.pick').setup({
-    window = { config = win_config },
-})
-vim.ui.select = require('mini.pick').ui_select
-
--- Better quickfix
-require('bqf.config').preview.winblend = 0
-require('bqf.config').preview.win_height = 999
-
--- Treesitter (highlighting)
---require 'nvim-treesitter.config'.setup {
---    -- A list of parser names, or "all" (the listed parsers MUST always be installed)
---    ensure_installed = { "c", "make", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
---
---    -- Install parsers synchronously (only applied to `ensure_installed`)
---    sync_install = false,
---
---    -- Automatically install missing parsers when entering buffer
---    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
---    auto_install = true,
---    indent = {
---        enable = false,
---    },
---
---    highlight = {
---        enable = true,
---    },
---}
-
--- Function signature context at the top
-ContextMaxHeight = 1
-require 'treesitter-context'.setup {
-    max_lines = ContextMaxHeight, -- How many lines the window should span. Values <= 0 mean no limit.
-    trim_scope = 'inner'
-}
 
 pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
 vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
         local arg = vim.fn.argv(0)
         if #arg == 1 and vim.fn.isdirectory(vim.fn.expand(arg)) ~= 0 then
+            -- telescope is lazy-loaded; force it (and its config/extensions) to
+            -- load before using the file_browser extension.
+            require('lazy').load({ plugins = { 'telescope.nvim' } })
             require("telescope").extensions.file_browser.file_browser()
         end
     end,
 })
 
-require('mason').setup({})
+vim.lsp.config.make_ls = {
+    cmd = {  os.getenv("GOPATH") .. "/bin/make-ls" },
+    root_markers = { "Makefile", "makefile", "GNUmakefile" },
+    filetypes = { 'make' },
+}
+
 vim.lsp.config.clangd = {
     root_markers = { '.clangd', 'compile_commands.json' },
     filetypes = { 'c', 'cpp' },
@@ -300,7 +301,7 @@ vim.lsp.config.clangd = {
         "--compile-commands-dir=" .. "/home/i749707",
     }
 }
-vim.lsp.config.luals = {
+vim.lsp.config.lua_ls = {
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
     settings = {
@@ -316,7 +317,7 @@ vim.lsp.config.ts_ls = {
     filetypes = { "javascript", "typescript", "vue", },
     settings = { hostInfo = "neovim" },
 }
-vim.lsp.config.html_lsp = {
+vim.lsp.config.html = {
     cmd = { "vscode-html-language-server", "--stdio" },
     filetypes = { "html", "templ" },
     init_options = {
@@ -349,32 +350,32 @@ vim.lsp.config.gdscript = {
 }
 
 local function reload_workspace(bufnr)
-  local clients = vim.lsp.get_clients { bufnr = bufnr, name = 'rust_analyzer' }
-  for _, client in ipairs(clients) do
-    vim.notify 'Reloading Cargo Workspace'
-    client.request('rust-analyzer/reloadWorkspace', nil, function(err)
-      if err then
-        error(tostring(err))
-      end
-      vim.notify 'Cargo workspace reloaded'
-    end, 0)
-  end
+    local clients = vim.lsp.get_clients { bufnr = bufnr, name = 'rust_analyzer' }
+    for _, client in ipairs(clients) do
+        vim.notify 'Reloading Cargo Workspace'
+        client.request('rust-analyzer/reloadWorkspace', nil, function(err)
+            if err then
+                error(tostring(err))
+            end
+            vim.notify 'Cargo workspace reloaded'
+        end, 0)
+    end
 end
 local function is_library(fname)
-  local user_home = vim.fs.normalize(vim.env.HOME)
-  local cargo_home = os.getenv 'CARGO_HOME' or user_home .. '/.cargo'
-  local registry = cargo_home .. '/registry/src'
-  local git_registry = cargo_home .. '/git/checkouts'
+    local user_home = vim.fs.normalize(vim.env.HOME)
+    local cargo_home = os.getenv 'CARGO_HOME' or user_home .. '/.cargo'
+    local registry = cargo_home .. '/registry/src'
+    local git_registry = cargo_home .. '/git/checkouts'
 
-  local rustup_home = os.getenv 'RUSTUP_HOME' or user_home .. '/.rustup'
-  local toolchains = rustup_home .. '/toolchains'
+    local rustup_home = os.getenv 'RUSTUP_HOME' or user_home .. '/.rustup'
+    local toolchains = rustup_home .. '/toolchains'
 
-  for _, item in ipairs { toolchains, registry, git_registry } do
-    if vim.fs.relpath(item, fname) then
-      local clients = vim.lsp.get_clients { name = 'rust_analyzer' }
-      return #clients > 0 and clients[#clients].config.root_dir or nil
+    for _, item in ipairs { toolchains, registry, git_registry } do
+        if vim.fs.relpath(item, fname) then
+            local clients = vim.lsp.get_clients { name = 'rust_analyzer' }
+            return #clients > 0 and clients[#clients].config.root_dir or nil
+        end
     end
-  end
 end
 
 vim.lsp.config.rust_analyzer = {
@@ -445,64 +446,132 @@ vim.lsp.config.rust_analyzer = {
     end,
 }
 
-vim.lsp.config.bash = {
+vim.lsp.config.bashls = {
     cmd = { "bash-language-server", "start" },
     filetypes = { "bash", "sh" },
     root_markers = { ".git" },
     settings = { bashIde = { globPattern = "*@(.sh|.inc|.bash|.command)" } }
 }
 
-vim.lsp.enable({ "luals", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "gopls", "rust_analyzer", "html_lsp", "bash" })
-
-local dap = require("dap")
-dap.adapters.gdb = {
-    type = "executable",
-    command = "gdb",
-    args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
+vim.lsp.config.yamlls= {
+  cmd = { 'yaml-language-server', '--stdio' },
+  before_init = function(_, config)
+    local local_cmd = vim.fs.joinpath(config.root_dir or '', 'node_modules/.bin', 'yaml-language-server')
+    if vim.fn.executable(local_cmd) == 1 then
+      config.cmd = { local_cmd, '--stdio' }
+    end
+  end,
+  filetypes = { 'yaml', 'yaml.docker-compose', 'yaml.gitlab', 'yaml.helm-values' },
+  root_markers = { '.git' },
+  ---@type lspconfig.settings.yamlls
+  settings = {
+    -- https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting
+    redhat = { telemetry = { enabled = false } },
+    -- formatting disabled by default in yaml-language-server; enable it
+    yaml = {
+      schemas = {
+        kubernetes = "k8s-*.yaml",
+        ["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
+        ["http://json.schemastore.org/github-action"] = ".github/action.{yml,yaml}",
+        ["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/**/*.{yml,yaml}",
+        ["http://json.schemastore.org/prettierrc"] = ".prettierrc.{yml,yaml}",
+        ["http://json.schemastore.org/kustomization"] = "kustomization.{yml,yaml}",
+        ["http://json.schemastore.org/chart"] = "Chart.{yml,yaml}",
+        ["http://json.schemastore.org/circleciconfig"] = ".circleci/**/*.{yml,yaml}",
+        ["https://raw.githubusercontent.com/GoogleContainerTools/skaffold/main/docs-v2/content/en/schemas/v3.json"] = "skaffold*.{yml,yaml}",
+      },
+      format = { enable = true }
+    },
+  },
 }
-dap.configurations.cpp = {
-    {
-        name = "Launch",
-        type = "gdb",
-        request = "launch",
-        program = function()
-            return vim.fn.input('Path to executable: ', Mybuildpath, "file")
-        end,
-        args = function()
-            return vim.fn.input('Select filter for test: ', '--gtest_filter=')
-        end,
-        cwd = Mybuildpath,
-        stopAtBeginningOfMainSubprogram = false
+
+vim.lsp.config.helm_ls= {
+    cmd = { "helm_ls", "serve" },
+    capabilities = {
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = true
+        }
+      }
+    },
+    filetypes = { "helm", "yaml.helm-values" },
+    root_markers = { "Chart.yaml" },
+    settings = {
+      ['helm-ls'] = {
+        logLevel = "info",
+        valuesFiles = {
+          mainValuesFile = "values.yaml",
+          lintOverlayValuesFile = "values.lint.yaml",
+          additionalValuesFilesGlobPattern = "values*.yaml"
+        },
+        helmLint = {
+          enabled = true,
+          ignoredMessages = {},
+        },
+        yamlls = {
+          enabled = true,
+          enabledForFilesGlob = "*.{yaml,yml}",
+          diagnosticsLimit = 50,
+          showDiagnosticsDirectly = false,
+          path = "yaml-language-server", -- or something like { "node", "yaml-language-server.js" }
+          initTimeoutSeconds = 3,
+          config = {
+            schemas = {
+              kubernetes = "templates/**",
+            },
+            completion = true,
+            hover = true,
+            -- any other config from https://github.com/redhat-developer/yaml-language-server#language-server-settings
+          }
+        }
+      }
     }
 }
-require("dapui").setup()
 
--- Autocomplete (via cmp)
+vim.lsp.config.gopls = {
+    cmd = { "gopls" },
+    filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    root_markers = { "go.work", "go.mod", ".git" },
+    settings = {
+        gopls = {
+            semanticTokens = true,
+            -- persist analysis cache across sessions
+            ["build.directoryFilters"] = { "-.git", "-node_modules" },
+        }
+    },
+}
+
+vim.lsp.enable({ "lua_ls", "clangd", "ts_ls", "perlnavigator", "pyright", "gdscript", "gopls", "rust_analyzer",
+    "html_lsp", "bashls", "make_ls", "yamlls", "helm_ls" })
+
+-- Autocomplete (via cmp) — deferred until first insert/cmdline entry so nvim-cmp
+-- does not load synchronously during startup.
+local function setup_cmp()
 local cmp = require('cmp')
 local kind_icons = {
-    Text = "",
+    Text = "",
     Method = "󰆧",
     Function = "󰊕",
-    Constructor = "",
+    Constructor = "",
     Field = "󰇽",
     Variable = "󰂡",
     Class = "󰠱",
-    Interface = "",
-    Module = "",
+    Interface = "",
+    Module = "",
     Property = "󰜢",
-    Unit = "",
+    Unit = "",
     Value = "󰎠",
-    Enum = "",
+    Enum = "",
     Keyword = "󰌋",
-    Snippet = "",
+    Snippet = "",
     Color = "󰏘",
     File = "󰈙",
-    Reference = "",
+    Reference = "",
     Folder = "󰉋",
-    EnumMember = "",
+    EnumMember = "",
     Constant = "󰏿",
-    Struct = "",
-    Event = "",
+    Struct = "",
+    Event = "",
     Operator = "󰆕",
     TypeParameter = "󰅲",
 }
@@ -521,31 +590,17 @@ cmp.setup({
         format = function(_, item)
             item.kind = kind_icons[item.kind]
 
-            -- Set the fixed width of the completion menu to 60 characters.
             local fixed_width = false
-            -- Set 'fixed_width' to false if not provided.
-            -- fixed_width = fixed_width or false
-
-            -- Get the completion entry text shown in the completion window.
             local content = item.abbr
             local sig = item.menu
 
-            -- Set the fixed completion window width.
             if fixed_width then
                 vim.o.pumwidth = fixed_width
             end
 
-            -- Get the width of the current window.
             local win_width = vim.api.nvim_win_get_width(0)
-
-            -- Set the max content width based on either: 'fixed_width'
-            -- or a percentage of the window width, in this case 25%.
-            -- We subtract 10 from 'fixed_width' to leave room for 'kind' fields.
             local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.25)
 
-            -- Truncate the completion entry text if it's longer than the
-            -- max content width. We subtract 3 from the max content width
-            -- to account for the "..." that will be appended to it.
             if #content > max_content_width then
                 item.abbr = vim.fn.strcharpart(content, 0, max_content_width - 3) .. "..."
             else
@@ -564,16 +619,12 @@ cmp.setup({
         end,
     },
     view = {
-        entries = "custom" -- can be "custom", "wildmenu" or "native"
+        entries = "custom"
     },
     mapping = cmp.mapping.preset.insert({
-        -- Navigate between completion items
         ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = 'select' }),
         ['<C-n>'] = cmp.mapping.select_next_item({ behavior = 'select' }),
-
-        -- `Enter` key to confirm completion
         ['<CR>'] = cmp.mapping.confirm({ select = false }),
-
         ['<Tab>'] = cmp.mapping(function(fallback)
             local col = vim.fn.col('.') - 1
 
@@ -585,11 +636,7 @@ cmp.setup({
                 cmp.complete()
             end
         end, { 'i', 's' }),
-
-        -- Ctrl+Space to trigger completion menu
         ['<C-Space>'] = cmp.mapping.complete(),
-
-        -- Navigate between snippet placeholder
         ['<C-f>'] = cmp.mapping(function(fallback)
             if vim.snippet.active({ direction = 1 }) then
                 vim.snippet.jump(1)
@@ -604,8 +651,6 @@ cmp.setup({
                 fallback()
             end
         end, { 'i', 's' }),
-
-        -- Scroll up and down in the completion documentation
         ['<C-u>'] = cmp.mapping.scroll_docs(-4),
         ['<C-d>'] = cmp.mapping.scroll_docs(4),
     }),
@@ -615,7 +660,6 @@ cmp.setup({
         end,
     },
 })
-
 
 -- `/` cmdline setup.
 cmp.setup.cmdline('/', {
@@ -638,73 +682,70 @@ cmp.setup.cmdline(':', {
         }
     })
 })
+end -- setup_cmp
 
--- Copilot settings
-if GithubCopilotEnabled then
-    vim.cmd("Copilot enable")
-else
-    vim.cmd("Copilot disable")
-end
-vim.lsp.inline_completion.enable(true)
+-- Load cmp on first insert/cmdline entry, then run the queued autocmd so cmp's
+-- own InsertEnter/CmdlineEnter handlers fire for this first event too.
+vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
+    once = true,
+    callback = function()
+        setup_cmp()
+    end,
+})
+
+-- Copilot settings. copilot.vim is lazy-loaded on InsertEnter (see init.lua), so
+-- enable/disable it — and turn on inline completion — on first insert rather than
+-- at startup. This avoids spawning the copilot-language-server (a node process
+-- that authenticates + connects to GitHub) before you actually type.
+vim.api.nvim_create_autocmd("InsertEnter", {
+    once = true,
+    callback = function()
+        if GithubCopilotEnabled then
+            vim.cmd("Copilot enable")
+        else
+            vim.cmd("Copilot disable")
+        end
+        vim.lsp.inline_completion.enable(true)
+    end,
+})
 
 
 -- CodeCompanion settings
 Codecompanion_config = {
-  display = {
-    chat = {
-      -- Change the default icons
-      icons = {
-        buffer_sync_all = "󰪴 ",
-        buffer_sync_diff = " ",
-        chat_context = " ",
-        chat_fold = " ",
-        tool_pending = "  ",
-        tool_in_progress = "  ",
-        tool_failure = "  ",
-        tool_success = "  ",
-      },
-      window = {
-        layout = "float", -- float|vertical|horizontal|buffer
-        width = 0.85,
-        height = .99,
-        border = "rounded",
-      },
+    display = {
+        chat = {
+            icons = {
+                buffer_sync_all = "󰪴 ",
+                buffer_sync_diff = " ",
+                chat_context = " ",
+                chat_fold = " ",
+                tool_pending = "  ",
+                tool_in_progress = "  ",
+                tool_failure = "  ",
+                tool_success = "  ",
+            },
+            window = {
+                layout = "float",
+                width = 0.85,
+                height = .99,
+                border = "rounded",
+            },
+        },
     },
-  },
-  interactions = {
-      chat = {},
+    interactions = {
+        chat = {},
     },
-  extensions = {
-    history = {
-      enabled = true, -- defaults to true
-      opts = {
-        dir_to_save = vim.fn.stdpath("data") .. "/codecompanion_chats.json",
-      }
+    extensions = {
+        spinner = {},
+        history = {
+            enabled = true,
+            opts = {
+                dir_to_save = vim.fn.stdpath("data") .. "/codecompanion_chats.json",
+            }
+        }
     }
-  }
 }
 
-vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
-    fg = '#c4b5c4',
-    ctermfg = 8,
-    force = true
-})
 
--- better markdown rendering
--- require('render-markdown').setup({
---   file_types = { 'markdown', 'copilot-chat' },
--- })
---
--- require('CopilotChat').setup({
---   highlight_headers = false,
---   separator = '---',
---   error_header = '> [!ERROR] Error',
--- })
-
-
--- smooth scrolling
-require("cinnamon").setup()
-
--- This has to go here because some plugin overwrites it
-vim.cmd("colorscheme kanagawa-wave")
 vim.cmd("highlight Cursor gui=NONE guifg=bg guibg=#C8C093")
+

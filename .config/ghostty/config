@@ -1,0 +1,6 @@
+copy-on-select = clipboard
+keybind = f13=text:\x1b[25~
+font-size = 13
+cursor-style = block
+cursor-style-blink = true
+shell-integration-features = no-cursor

@@ -1,0 +1,65 @@
+alias editaliases='nvim ~/.zsh_aliases'
+alias reloadaliases='source ~/.zsh_aliases'
+alias grep='grep --color=auto'
+alias k="kubectl "
+alias v="viddy "
+
+alias dns-reset='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+alias fix-network='launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp* && launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*'
+
+logvim() {
+  local dir="/tmp/mylogs"
+  local ext="log"
+  local file
+  local opt
+  local OPTIND=1
+
+  while getopts ":o:" opt; do
+    case "$opt" in
+      o)
+        ext="$OPTARG"
+        ;;
+      :)
+        echo "usage: logvim [-o filetype]" >&2
+        return 2
+        ;;
+      \?)
+        echo "usage: logvim [-o filetype]" >&2
+        return 2
+        ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  file="$dir/$(date '+%Y-%m-%d_%H-%M-%S').$ext"
+
+  mkdir -p "$dir" || return 1
+  cat > "$file"
+  nvim "$file"
+  echo "$file"
+}
+alias vimlog='logvim'
+alias lv='logvim'
+alias ly='logvim -oyaml'
+alias lj='logvim -ojson'
+
+alias gkremote='export KUBECONFIG=./dev-setup/kubeconfigs/remote/kubeconfig'
+alias gkruntime='export KUBECONFIG=./dev-setup/kubeconfigs/runtime/kubeconfig'
+alias gkvirtualgarden='export KUBECONFIG=./dev-setup/kubeconfigs/virtual-garden/kubeconfig'
+
+alias setupremotegarden='\
+mkdir -p ./dev && \
+cp ../gardener/dev/cloudprofile-aws.yaml ./dev/ && \
+cp ../gardener/shoot-remote-seed.yaml . && \
+cp ../gardener/dev-setup/garden/overlays/remote/garden.yaml ./dev-setup/garden/overlays/remote/garden.yaml && \
+cp ../gardener/dev-setup/garden/overlays/remote/secret-dns.yaml ./dev-setup/garden/overlays/remote/secret-dns.yaml && \
+cp ../gardener/dev-setup/gardenlet/overlays/remote/gardenlet.yaml ./dev-setup/gardenlet/overlays/remote/gardenlet.yaml && \
+cp ../gardener/dev-setup/gardenconfig/overlays/remote/credentials/domains/domain-secrets.yaml ./dev-setup/gardenconfig/overlays/remote/credentials/domains/domain-secrets.yaml && \
+cp ../gardener/dev-setup/gardenconfig/overlays/remote/credentials/credentials-project-remote/infrastructure-secrets.yaml ./dev-setup/gardenconfig/overlays/remote/credentials/credentials-project-remote/infrastructure-secrets.yaml && \
+cp ../gardener/dev-setup/gardenconfig/overlays/remote/credentials/credentials-project-remote/credentialsbindings.yaml ./dev-setup/gardenconfig/overlays/remote/credentials/credentials-project-remote/credentialsbindings.yaml && \
+cp ../gardener/dev-setup/gardenconfig/overlays/remote/cloudprofile/cloudprofiles.yaml ./dev-setup/gardenconfig/overlays/remote/cloudprofile/cloudprofiles.yaml && \
+cp ../gardener/dev-setup/extensions/remote/extensions.yaml ./dev-setup/extensions/remote/extensions.yaml && \
+cp ../gardener/shoot-with-workers.yaml . && \
+cp ../gardener/shoot-workerless.yaml .'
+
+alias refreshremotekubeconfig='gk && g target --garden sap-landscape-dev && ./hack/usage/generate-kubeconfig.sh shoot --shoot-name remote-seed --namespace garden-i749707 --expiration-minutes 1440 > dev-setup/kubeconfigs/remote/kubeconfig && make remote-up'

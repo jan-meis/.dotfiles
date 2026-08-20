@@ -11,6 +11,24 @@ function TmuxSend(command, pane)
   vim.cmd('!tmux send-keys -t ' .. pane .. ' \"' ..  command .. '" ENTER')
 end
 
+function NavigateFold(direction)
+  local cmd = "normal! " .. direction
+  local view = vim.fn.winsaveview()
+  local lnum = view.lnum
+  local new_lnum = lnum
+  local open = true
+
+  while lnum == new_lnum or open do
+    vim.cmd(cmd)
+    new_lnum = vim.fn.line "."
+    open = vim.fn.foldclosed(new_lnum) < 0
+  end
+
+  if open then
+    vim.fn.winrestview(view)
+  end
+end
+
 -- general vim QoL improvments
 vim.keymap.set("n", "<F1>", function() local wordUnderCursor = vim.fn.expand("<cword>"); vim.cmd("tab Man " .. wordUnderCursor) end, { desc = "Get Man page for word under cursor" })
 vim.keymap.set("n", "n", "nzzzv")
@@ -24,6 +42,8 @@ vim.keymap.set("n", "<leader>ht", function() vim.cmd("set list!") end, { desc = 
 vim.keymap.set({ "n" }, "<leader>+", "<C-w>T", { desc = "Maximize current split" })
 vim.keymap.set({ "n" }, "<C-w>e", ":vnew | q<CR>", { desc = "Equalize  splits" })
 vim.keymap.set({ "n" }, "<C-w>E", ":new | q<CR>", { desc = "Equalize horizontal splits" })
+vim.keymap.set("n", "zj", ':lua NavigateFold("j")<CR>', { noremap = true, silent = true })
+vim.keymap.set("n", "zk", ':lua NavigateFold("k")<CR>', { noremap = true, silent = true })
 
 -- clipboard / yank / paste
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
@@ -105,18 +125,43 @@ vim.keymap.set("n", "<leader>q", toggleQuickfix, { desc = "Toggle quickfix list"
 vim.keymap.set("n", "<leader>w", toggleLocation, { desc = "Toggle quickfix list" })
 
 -- File explorer (directory tree)
-vim.keymap.set("n", "<leader>ft", require("nvim-tree.api").tree.toggle, { desc = "Open file explorer" })
+-- nvim-tree keymap is defined in init.lua via lazy keys so the plugin loads on demand
 vim.keymap.set("n", "<space>fe", function()
   require("telescope").extensions.file_browser.file_browser()
 end, { desc = "Open file browser" })
 
+vim.keymap.set("n", "<space>fE", function()
+  local current_file_dir = vim.fn.expand("%:p:h")
+
+  if current_file_dir == "" then
+    current_file_dir = vim.loop.cwd()
+  end
+
+  require("telescope").extensions.file_browser.file_browser({
+    path = current_file_dir,
+    cwd = current_file_dir,
+  })
+end, { desc = "Open file browser at current file directory" })
+
 -- My own QoL functions for copying context
+
+local function getFilePath()
+  return vim.fn.expand('%:.')
+end
+
 local function getFilePathAndLineNumber()
   return vim.fn.expand('%:.') .. ":" .. vim.fn.getcurpos()[2]
 end
 
+
 local function copyLineNumber()
   local ret = vim.fn.getcurpos()[2]
+  vim.fn.setreg("+", ret)
+  print(string.format("Copied %s to clipboard.", ret))
+end
+
+local function copyFilePath()
+  local ret = getFilePath()
   vim.fn.setreg("+", ret)
   print(string.format("Copied %s to clipboard.", ret))
 end
@@ -161,6 +206,7 @@ end
 vim.keymap.set("n", "<leader>sb", setFilePathAndLineNumber, { desc = "Set line number and file path" })
 vim.keymap.set("n", "<leader>st", setCurrentTest, { desc = "Set test name" })
 vim.keymap.set("n", "<leader>cb", copyFilePathAndLineNumber, { desc = "Copy line number and file path" })
+vim.keymap.set("n", "<leader>cf", copyFilePath, { desc = "Copy file path" })
 vim.keymap.set("n", "<leader>ct", copyCurrentTest, { desc = "Copy test name" })
 vim.keymap.set("n", "<leader>cn", copyLineNumber, { desc = "Copy line number" })
 vim.keymap.set("n", "<leader>cv", copyFilePathAndLineNumberForNvimOpen, { desc = "Copy command to open nvim here" })
@@ -183,7 +229,7 @@ vim.keymap.set({ 'n', 'i' }, '<C-F7>',
 vim.keymap.set('i', '<F8>', '<Plug>(copilot-suggest)', { desc = "Suggest copilot completion" })
 --vim.keymap.set('i', '<F9>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false, desc = "Accept copilot completion" })
 -- vim.keymap.set({'n'}, '<F7>', ':CopilotChatToggle<CR>', { desc = "Toggle Copilot Chat" })
-vim.keymap.set({'n'}, '<F7>', ':CodeCompanionChat toggle<CR>', { desc = "Toggle Copilot Chat" })
+vim.keymap.set({'n'}, '<F7>', ':CodeCompanionChat Toggle<CR>', { desc = "Toggle Copilot Chat" })
 vim.keymap.set('i', '<C-F8>', '<Plug>(copilot-previous)', { desc = "Previous copilot suggestion" })
 vim.keymap.set('i', '<M-F8>', '<Plug>(copilot-dismiss)', { desc = "Dismiss copilot suggestion" })
 vim.keymap.set('i', '<C-F9>', '<Plug>(copilot-next)', { desc = "Next copilot suggestion" })
@@ -193,16 +239,8 @@ vim.keymap.set({'n', 'v'}, '<leader>ai', '<cmd>CodeCompanionActions <cr>', { nor
 vim.keymap.set({'n', 'v'}, '<leader>aa', '<cmd>CodeCompanionChat Add <cr>', { desc = "Add to AI chat" })
 vim.keymap.set({'n', 'v'}, '<leader>ap', '<cmd>CodeCompanion<cr>', { desc = "Open inline AI prompt" })
 
--- Dap settings
-vim.keymap.set({ "n" }, "<leader>b", require'dap'.toggle_breakpoint, { desc = "Toggle breakpoint" })
-vim.keymap.set({ "n" }, "<leader><F5>", require("dapui").toggle, { desc = "Open DAP UI" })
-vim.keymap.set({ 'n', 'i' }, '<F5>', function() require('dap').continue() end, { desc = "DAP continue" })
-vim.keymap.set({ 'n', 'i' }, '<F10>', function() require('dap').step_over() end, { desc = "DAP step over" })
-vim.keymap.set({ 'n', 'i' }, '<C-F11>', function() require('dap').step_into() end, { desc = "DAP step into" })
-vim.keymap.set({ 'n', 'i' }, '<F12>', function() require('dap').step_out() end, { desc = "DAP step out" })
-
 -- treesitter-context (show function signature in top row)
-vim.keymap.set("n", "<leader>gu", function() require("treesitter-context").go_to_context(vim.v.count1) end, { silent = true, desc = "Go to function signature" })
+vim.keymap.set("n", "<leader>gu", function() require("treesitter-context").go_to_context(vim.v.count1) end, { silent = true, desc = "Go to treesitter-context" })
 vim.keymap.set("n", "<leader>c+", function()
         ContextMaxHeight = ContextMaxHeight + 1
         require 'treesitter-context'.setup { max_lines = ContextMaxHeight, trim_scope = 'inner' }
@@ -213,29 +251,29 @@ vim.keymap.set("n", "<leader>c/", function()
 end, { desc = "Increase context line height" })
 
 -- Telescope
-local tb = require('telescope.builtin')
-local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
-vim.keymap.set('n', '<leader>ff', function() tb.find_files({no_ignore = true}) end , { desc = "Find files" })
-vim.keymap.set('n', '<leader>fr', tb.resume, { desc = "Resume telescope search" })
-vim.keymap.set('n', '<leader>fw', live_grep_args_shortcuts.grep_word_under_cursor, { desc = "Find word under cursor" })
-vim.keymap.set({'n', 'v'}, '<leader>fi', function() live_grep_args_shortcuts.grep_word_under_cursor({ postfix = "", quote = false }) end, { desc = "Find word in visual selection" })
-vim.keymap.set('v', '<leader>fg', live_grep_args_shortcuts.grep_visual_selection, { desc = "Find word in visual selection" })
-vim.keymap.set('n', '<leader>fW', live_grep_args_shortcuts.grep_word_under_cursor_current_buffer, { desc = "Find word under cursor in current buffer" })
-vim.keymap.set('v', '<leader>fG', live_grep_args_shortcuts.grep_word_visual_selection_current_buffer, { desc = "Find word in visual selection in current buffer" })
-vim.keymap.set('n', '<leader>fg', require("telescope").extensions.live_grep_args.live_grep_args, { desc = "Grep files" })
-vim.keymap.set('n', '<leader>l', function() tb.buffers({ sort_mru = true }) end, { desc = "Find in buffers" })
-vim.keymap.set('n', '<leader>fl', tb.oldfiles, { desc = "Previously opened files" })
-vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = "Find help" })
-vim.keymap.set('n', '<leader>fc',
+local pwd = .55
+local phd = .8
+vim.keymap.set('n', '<leader>ff', function() require('telescope.builtin').find_files({no_ignore = true, layout_config={preview_width = pwd} }) end, { desc = "Find files" })
+vim.keymap.set('n', '<leader>fr', function() require('telescope.builtin').resume() end, { desc = "Resume telescope search" })
+vim.keymap.set('n', '<leader>fw', function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor({layout_config={preview_width = pwd}}) end, { desc = "Find word under cursor" })
+vim.keymap.set('n', '<leader>fW', function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor_current_buffer({layout_strategy='vertical', layout_config={ preview_height=phd } }) end, { desc = "Find word under cursor in current buffer" })
+vim.keymap.set({'n', 'v'}, '<leader>fi', function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor({ postfix = "", quote = false, layout_config={preview_width = pwd} }) end, { desc = "Find word in visual selection" })
+vim.keymap.set('n', '<leader>fg', function() require("telescope").extensions.live_grep_args.live_grep_args({layout_config={preview_width = pwd}}) end, { desc = "Grep files" })
+vim.keymap.set('v', '<leader>fg', function() require("telescope-live-grep-args.shortcuts").grep_visual_selection({layout_config={preview_width = pwd}}) end, { desc = "Find word in visual selection" })
+vim.keymap.set('v', '<leader>fG', function() require("telescope-live-grep-args.shortcuts").grep_word_visual_selection_current_buffer({layout_config={preview_width = pwd}}) end, { desc = "Find word in visual selection in current buffer" })
+vim.keymap.set('n', '<leader>fG',
   function()
-    require("telescope.builtin").current_buffer_fuzzy_find({  fuzzy = true, case_mode = "ignore_case" })
-  end,
-  { desc = "Find in current buffer" })
-vim.keymap.set('n', '<leader>fC',
-  function()
-    require("telescope").extensions.live_grep_args.live_grep_args({path_display="hidden", search_dirs={"%:p"}})
+    require("telescope").extensions.live_grep_args.live_grep_args({path_display="hidden", search_dirs={"%:p"}, layout_config={preview_width = pwd}})
   end,
   { desc = "Grep in current buffer" })
+vim.keymap.set('n', '<leader>l', function() require('telescope.builtin').buffers({ sort_mru = true }) end, { desc = "Find in buffers" })
+vim.keymap.set('n', '<leader>fl', function() require('telescope.builtin').oldfiles({layout_config={preview_width = pwd}}) end, { desc = "Previously opened files" })
+vim.keymap.set('n', '<leader>fh', function() require('telescope.builtin').help_tags() end, { desc = "Find help" })
+vim.keymap.set('n', '<leader>fc',
+  function()
+    require("telescope.builtin").current_buffer_fuzzy_find({ fuzzy = true, case_mode = "ignore_case", layout_strategy='vertical', layout_config={preview_height= phd}})
+  end,
+  { desc = "Find in current buffer" })
 
 -- undoTree
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = "Toggle UndoTree" })
@@ -256,19 +294,16 @@ function RunAsyncCommand(command)
 end
 
 -- fugitive (git)
-vim.keymap.set("n", "<leader>gv", ":tab Gvdiffsplit!<CR>", { desc = "Open three-way split in new tab" })
-vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit --allow-empty && git push ccde -f<CR>", { desc = "git sync ammended commit with ccde" })
-vim.keymap.set("n", "<leader>gm", function() RunAsyncCommand("git add . && git commit --amend --no-edit --allow-empty && git push ccde -f && tmux send-keys -t 1 ENTER \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER") end, { desc = "git sync and make on ccde" })
-vim.keymap.set("n", "<leader>rs",
-function()
-    local absPath = vim.api.nvim_buf_get_name(0)
-    RunAsyncCommand("rsync -vP " .. absPath .. " $USER@$BUILDMACHINE:" .. absPath)
-end, { desc = "rsync to build machine" })
+vim.keymap.set("ca", "G", "tab G")
+vim.keymap.set("n", "<leader>gv", ":tab Gvdiffsplit<CR>", { desc = "Git open three-way split in new tab" })
+vim.keymap.set("n", "<leader>gh", ":tab Gvdiffsplit origin/HEAD<CR>", { desc = "Git open three-way split against origin/HEAD in new tab" })
+vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f<CR>", { desc = "Git sync ammended commit with build machine" })
+vim.keymap.set("n", "<leader>gm", function() RunAsyncCommand("git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f && tmux send-keys -t 1 ENTER \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER") end, { desc = "Git sync and make on build machine" })
 
---vim.keymap.set("n", "<leader>gm", function() vim.system({ "sh", "-c", "tmux send-keys -t 1 \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER" } ) end, { desc = "git sync and make on ccde" })
-vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTER<CR>", { desc = "make on ccde" })
-vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "git ammend commit message" })
-vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "git create new commit" })
+--vim.keymap.set("n", "<leader>gm", function() vim.system({ "sh", "-c", "tmux send-keys -t 1 \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER" } ) end, { desc = "git sync and make on buildmachine " })
+vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTER<CR>", { desc = "Git make on buildmachine" })
+vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "Git ammend commit message" })
+vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "Git create new commit" })
 vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
 vim.api.nvim_create_autocmd("User", {
     pattern = "FugitiveIndex",
@@ -280,6 +315,12 @@ vim.api.nvim_create_autocmd("User", {
         })
     end,
 })
+
+vim.keymap.set("n", "<leader>rs",
+function()
+    local absPath = vim.api.nvim_buf_get_name(0)
+    RunAsyncCommand("rsync -vP " .. absPath .. " $USER@$BUILDMACHINE:" .. absPath)
+end, { desc = "rsync to build machine" })
 --vim.keymap.set("n", "<leader>gT", function()
     --    local handle = io.popen("git diff --name-only @{u}...HEAD 2>/dev/null")
     --    if not handle then
@@ -315,18 +356,18 @@ vim.keymap.set("n", "<leader>eb", ":tabnew ~/build<CR>", { desc = "edit build co
 vim.keymap.set("n", "<leader>ec", ":tabnew ~/copy<CR>", { desc = "edit copy command" })
 
 -- cinnamon (centered scrolling)
-vim.keymap.set({ "n", "v" }, "<C-u>", function() require("cinnamon").scroll("<C-u>zz") end)
-vim.keymap.set({ "n", "v" }, "<C-d>", function() require("cinnamon").scroll("<C-d>zz") end)
-vim.keymap.set({ "n", "v" }, "<C-f>", function() require("cinnamon").scroll("<C-f>zz") end)
-vim.keymap.set({ "n", "v" }, "<C-b>", function() require("cinnamon").scroll("zz<C-b>") end)
-vim.keymap.set({ "n", "v" }, "zz", function() require("cinnamon").scroll("zz") end)
-vim.keymap.set({ "n", "v" }, "<C-e>", function() require("cinnamon").scroll("<C-e>") end)
-vim.keymap.set({ "n", "v" }, "<C-y>", function() require("cinnamon").scroll("<C-y>") end)
+-- vim.keymap.set({ "n", "v" }, "<C-u>", function() require("cinnamon").scroll("<C-u>zz") end)
+-- vim.keymap.set({ "n", "v" }, "<C-d>", function() require("cinnamon").scroll("<C-d>zz") end)
+-- vim.keymap.set({ "n", "v" }, "<C-f>", function() require("cinnamon").scroll("<C-f>zz") end)
+-- vim.keymap.set({ "n", "v" }, "<C-b>", function() require("cinnamon").scroll("zz<C-b>") end)
+-- vim.keymap.set({ "n", "v" }, "zz", function() require("cinnamon").scroll("zz") end)
+-- vim.keymap.set({ "n", "v" }, "<C-e>", function() require("cinnamon").scroll("<C-e>") end)
+-- vim.keymap.set({ "n", "v" }, "<C-y>", function() require("cinnamon").scroll("<C-y>") end)
 
 -- arrow (quick navigation)
-vim.keymap.set({ "n" }, "<leader>m", "m" ) -- this will activate non-arrow marks
-vim.keymap.set({ "n" }, "M", "," ) -- undo last jump (normally mapped to ,)
-vim.keymap.set({ "n" }, "Z", "M" ) -- Go to middle of screen
+--vim.keymap.set({ "n" }, "<leader>m", "m" ) -- this will activate non-arrow marks
+--vim.keymap.set({ "n" }, "Z", "M" ) -- this will activate non-arrow marks
+
 
 -- easy navigation to often used files
 vim.keymap.set({ "n" }, "<leader>`r", ":e ~/.config/nvim/lua/remap.lua<CR>")
