@@ -195,49 +195,88 @@ Spec = {
     },
   },
   -- better global marks
-  {
-      "otavioschwanck/arrow.nvim",
-      event = "VeryLazy",
-      dependencies = {
-          { "nvim-tree/nvim-web-devicons" },
-      },
-      opts = {
-          show_icons = true,
-          leader_key = 'q', -- Recommended to be a single key
-          buffer_leader_key = 'Q', -- Per Buffer Mappings
-          separate_by_branch = true,
-      }
+{
+  "LintaoAmons/bookmarks.nvim",
+  event = "VeryLazy",
+  -- pin the plugin at specific version for stability
+  -- backup your bookmark sqlite db when there are breaking changes (major version change)
+  tag = "v4.0.0",
+  dependencies = {
+    {"kkharji/sqlite.lua"},
+    -- picker backend (choose one):
+    -- {"folke/snacks.nvim"},              -- default picker backend
+    {"nvim-telescope/telescope.nvim"}, -- set picker.picker_backend = "telescope" to use
   },
-  {
-      "heilgar/bookmarks.nvim",
-      dependencies = {
-          "kkharji/sqlite.lua",
-          "nvim-telescope/telescope.nvim",
-          "nvim-lua/plenary.nvim",
-      },
-      config = function()
-          require("bookmarks").setup({
-              -- your configuration comes here
-              -- or leave empty to use defaults
-              default_mappings = true,
-              db_path = vim.fn.stdpath('data') .. '/bookmarks.db'
-          })
-          require("telescope").load_extension("bookmarks")
-      end,
-      cmd = {
-          "BookmarkAdd",
-          "BookmarkRemove",
-          "Bookmarks"
-      },
-      keys = {
-          { "<leader>ba", "<cmd>BookmarkAdd<cr>", desc = "Add Bookmark" },
-          { "<leader>br", "<cmd>BookmarkRemove<cr>", desc = "Remove Bookmark" },
-          { "<leader>bj", desc = "Jump to Next Bookmark" },
-          { "<leader>bk", desc = "Jump to Previous Bookmark" },
-          { "<leader>bl", "<cmd>Bookmarks<cr>", desc = "List Bookmarks" },
-          { "<leader>bs", desc = "Switch Bookmark List" },
-      },
-  },
+  config = function()
+    local opts = {
+      picker = {
+          picker_backend = "telescope", -- "snacks" (default) or "telescope"
+          -- Show the file path relative to cwd (":." modifier) instead of the
+          -- default abbreviated absolute path. Lead with the (varying) path so
+          -- Telescope's sorter has distinct ordinal text to rank by — leading with
+          -- the name flattened ordering because unnamed marks all tie.
+          entry_display = function(bookmark, bookmarks)
+              local relpath = vim.fn.fnamemodify(bookmark.location.path, ":.")
+              local suffix = bookmark.name ~= "" and (" │ " .. bookmark.name) or ""
+              return string.format("%s:%d%s", relpath, bookmark.location.line, suffix)
+            end,
+        },
+      signs = {
+          mark = {
+              -- match the "normal" background so the bookmarked line isn't tinted
+              line_bg = "#1f1f28",
+            },
+          -- drop the leading "<order>: " number; just show the name (empty for quick-marks)
+          desc_format = function(bookmark)
+              return bookmark.name
+            end,
+        },
+    } -- check the "./lua/bookmarks/default-config.lua" file for all the options
+    require("bookmarks").setup(opts) -- you must call setup to init sqlite db
+
+    -- Quick (nameless) bookmark toggle: like :BookmarksMark but with no name prompt.
+    vim.api.nvim_create_user_command("BookmarksQuickMark", function()
+      local Service = require("bookmarks.domain.service")
+      local Sign    = require("bookmarks.sign")
+      local Tree    = require("bookmarks.tree.operate")
+      Service.toggle_mark("")
+      Sign.safe_refresh_signs()
+      pcall(Tree.refresh)
+    end, { desc = "Toggle a nameless bookmark on the current line into the active list." })
+
+    vim.keymap.set("n", "mm", "<cmd>BookmarksQuickMark<cr>", { desc = "Quick bookmark (no name)" })
+
+    -- Goto picker forced into telescope's vertical layout (leaves global telescope
+    -- defaults untouched; opts flow straight into telescope's pickers.new).
+    -- Also restores most-recently-visited-on-top: v4.0.0's picker never sorts by
+    -- visited_at (the sort_by config key is unused), so we pre-sort the list and
+    -- hand it in via opts.bookmarks. Telescope keeps this order until you type.
+    vim.api.nvim_create_user_command("BookmarksGotoVertical", function()
+      local Picker  = require("bookmarks.picker")
+      local Service = require("bookmarks.domain.service")
+      local Sign    = require("bookmarks.sign")
+      local Repo    = require("bookmarks.domain.repo")
+      local Node    = require("bookmarks.domain.node")
+
+      local active_list = Repo.ensure_and_get_active_list()
+      local marks = Node.get_all_bookmarks(active_list)
+      table.sort(marks, function(a, b)
+        return (a.visited_at or 0) > (b.visited_at or 0)
+      end)
+
+      Picker.pick_bookmark(function(bookmark)
+        if bookmark then
+          Service.goto_bookmark(bookmark.id)
+          Sign.safe_refresh_signs()
+        end
+      end, {
+        bookmarks = marks,
+        layout_strategy = "vertical",
+        layout_config = { preview_height = 0.7 },
+      })
+    end, { desc = "Goto a bookmark (vertical layout, most-recently-visited first)." })
+  end,
+},
 
 -- run :BookmarksInfo to see the running status of the plugin
 

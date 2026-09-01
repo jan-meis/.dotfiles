@@ -1,6 +1,15 @@
 bindkey -e
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+# Writable completion cache so gardenctl doesn't try to write into root-owned fpath dirs.
+# Must be on fpath BEFORE compinit so cached completions (e.g. _kubectl) get autoloaded.
+export ZSH_CACHE_DIR="$HOME/.zsh/cache"
+mkdir -p "$ZSH_CACHE_DIR/completions"
+fpath=("$ZSH_CACHE_DIR/completions" $fpath)
+# Cache kubectl completions — delete ~/.zsh/cache/completions/_kubectl to regenerate
+_kubectl_comp="$ZSH_CACHE_DIR/completions/_kubectl"
+[[ -f $_kubectl_comp ]] || kubectl completion zsh >| $_kubectl_comp
 autoload -Uz compinit && compinit
+compdef k=kubectl
 source <(fzf --zsh)
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Cache gardenctl rc output — regenerate with: gardenctl rc zsh > ~/.gardenctl_rc.zsh

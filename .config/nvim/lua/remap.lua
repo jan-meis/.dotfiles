@@ -365,8 +365,11 @@ vim.keymap.set("n", "<leader>ec", ":tabnew ~/copy<CR>", { desc = "edit copy comm
 -- vim.keymap.set({ "n", "v" }, "<C-y>", function() require("cinnamon").scroll("<C-y>") end)
 
 -- arrow (quick navigation)
---vim.keymap.set({ "n" }, "<leader>m", "m" ) -- this will activate non-arrow marks
---vim.keymap.set({ "n" }, "Z", "M" ) -- this will activate non-arrow marks
+-- mm is defined in init
+vim.keymap.set({ "n", "v" }, "mn", "<cmd>BookmarksMark<cr>", { desc = "Mark current line into active BookmarkList." })
+vim.keymap.set({ "n", "v" }, "mN", "<cmd>BookmarksDesc<cr>", { desc = "Add description to bookmark under cursor." })
+vim.keymap.set({ "n", "v" }, "mo", "<cmd>BookmarksGotoVertical<cr>", { desc = "Go to bookmark at current active BookmarkList" })
+vim.keymap.set({ "n", "v" }, "mi", "<cmd>BookmarksCommands<cr>", { desc = "Find and trigger a bookmark command." })
 
 
 -- easy navigation to often used files

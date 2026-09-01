@@ -40,7 +40,6 @@ vim.opt.smartindent = true
 vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.breakindent = true
--- pad breakindent so the arrows sit under the text, then a run of arrows
 vim.opt.breakindentopt ='shift:-2'  -- or 'sbr'
 vim.opt.showbreak = '↳↳'
 
@@ -69,10 +68,6 @@ require('kanagawa').setup({
   end,
 })
 vim.cmd("colorscheme kanagawa-wave")
-vim.api.nvim_set_hl(0, "BookmarkHighlight", {
-    bg = "#1f1f28",
-    underline = false
-})
 
 vim.cmd("autocmd FileType help wincmd T")
 vim.cmd("autocmd FileType * setlocal formatoptions-=o")
@@ -112,14 +107,6 @@ vim.api.nvim_create_autocmd("User", {
     pattern = "VeryLazy",
     once = true,
     callback = function()
-        local statusline = require('arrow.statusline')
-
-          require("bookmarks").setup({
-              -- your configuration comes here
-              -- or leave empty to use defaults
-              default_mappings = true,
-              db_path = vim.fn.stdpath('data') .. '/bookmarks.db'
-          })
         local function selectionCount()
             local isVisualMode = vim.fn.mode():find("[Vv]")
             if not isVisualMode then return "" end
@@ -156,7 +143,6 @@ vim.api.nvim_create_autocmd("User", {
                 -- from truncating it early, and path = 1 shows the relative path.
                 lualine_c = {
                     { 'filename', path = 1, shorting_target = 0 },
-                    { { function() return require('bookmarks').status() end } },
                     { isRecording },
                 },
                 lualine_z = { "location", { selectionCount } },
