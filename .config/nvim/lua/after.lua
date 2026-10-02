@@ -167,6 +167,10 @@ function Telescope_setup()
     local actions = require("telescope.actions")
     require("telescope").setup {
         defaults = {
+            -- Truncate long paths with a leading "..." rather than letting them
+            -- overflow. Applies to every builtin picker; individual keymaps can
+            -- still override path_display in their own opts.
+            path_display = { "truncate" },
             layout_config = {
                 width = { padding = 1 },
                 height = { padding = 1 },
@@ -284,7 +288,7 @@ vim.lsp.config.clangd = {
         "--fallback-style=llvm",
         "--header-insertion=never",
         "--offset-encoding=utf-16",
-        "--compile-commands-dir=" .. "/home/i749707",
+        "--compile-commands-dir=" .. (os.getenv("CLANGD_COMPILE_COMMANDS_DIR") or os.getenv("HOME")),
     }
 }
 vim.lsp.config.lua_ls = {

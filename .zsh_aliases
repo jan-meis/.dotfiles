@@ -1,12 +1,20 @@
 alias editaliases='nvim ~/.zsh_aliases'
 alias reloadaliases='source ~/.zsh_aliases'
+
+# cli tools
 alias grep='grep --color=auto'
-alias k="kubectl "
+alias kubectl="kubecolor "
+alias k="kubecolor "
 alias v="viddy "
+alias lg="lazygit"
 
 alias dns-reset='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
-alias fix-network='launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp* && launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*'
 
+recent() {
+  find . -type f -not -path './.git/*' -exec /usr/bin/stat -f '%m %Sm %N' {} + | sort -rn | head -"${1:-10}"
+}
+
+# logs with vim
 logvim() {
   local dir="/tmp/mylogs"
   local ext="log"
@@ -43,9 +51,12 @@ alias lv='logvim'
 alias ly='logvim -oyaml'
 alias lj='logvim -ojson'
 
+# gardener
 alias gkremote='export KUBECONFIG=./dev-setup/kubeconfigs/remote/kubeconfig'
 alias gkruntime='export KUBECONFIG=./dev-setup/kubeconfigs/runtime/kubeconfig'
 alias gkvirtualgarden='export KUBECONFIG=./dev-setup/kubeconfigs/virtual-garden/kubeconfig'
+alias gkadminkubeconf='export KUBECONFIG=./admin-kubeconf.yaml'
+alias gkadminkubeconf='export KUBECONFIG=./admin-kubeconf.yaml'
 
 alias setupremotegarden='\
 mkdir -p ./dev && \
@@ -61,5 +72,7 @@ cp ../gardener/dev-setup/gardenconfig/overlays/remote/cloudprofile/cloudprofiles
 cp ../gardener/dev-setup/extensions/remote/extensions.yaml ./dev-setup/extensions/remote/extensions.yaml && \
 cp ../gardener/shoot-with-workers.yaml . && \
 cp ../gardener/shoot-workerless.yaml .'
-
-alias refreshremotekubeconfig='gk && g target --garden sap-landscape-dev && ./hack/usage/generate-kubeconfig.sh shoot --shoot-name remote-seed --namespace garden-i749707 --expiration-minutes 1440 > dev-setup/kubeconfigs/remote/kubeconfig && make remote-up'
+alias myremotesetup='RUNTIME_CLUSTER_KUBECONFIG="$PWD/dev-setup/kubeconfigs/runtime/kubeconfig" \
+GARDEN_NAME="remote" \
+./hack/usage/generate-kubeconfig.sh virtual-garden \
+> dev-setup/kubeconfigs/virtual-garden/kubeconfig'

@@ -14,6 +14,8 @@ export LANGUAGE=en_US.UTF-8
 
 export EDITOR=nvim
 
+export TMUX_DEFAULT_TERMINAL=xterm-256color
+
 # HISTORY SETTINGS
 HISTFILE=$HOME/.bash_history_file
 HISTSIZE=10000

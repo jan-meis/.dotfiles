@@ -1,3 +1,4 @@
 .config/nvim/lazy-lock.json
 .config/nvim/lua/machine_specific*
 .config/nvim/pack
+.zsh_private

@@ -1,3 +1,4 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
 bindkey -e
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 # Writable completion cache so gardenctl doesn't try to write into root-owned fpath dirs.
@@ -7,10 +8,15 @@ mkdir -p "$ZSH_CACHE_DIR/completions"
 fpath=("$ZSH_CACHE_DIR/completions" $fpath)
 # Cache kubectl completions — delete ~/.zsh/cache/completions/_kubectl to regenerate
 _kubectl_comp="$ZSH_CACHE_DIR/completions/_kubectl"
-[[ -f $_kubectl_comp ]] || kubectl completion zsh >| $_kubectl_comp
+[[ -f $_kubectl_comp ]] || command kubectl completion zsh >| $_kubectl_comp
 autoload -Uz compinit && compinit
+# kubectl and k are aliased to `kubecolor`; with completealiases off, zsh completes
+# the expanded command, so register kubectl's completion under `kubecolor`.
+compdef kubecolor=kubectl
+compdef kubectl=kubectl
 compdef k=kubectl
 source <(fzf --zsh)
+source <(stern --completion=zsh)
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Cache gardenctl rc output — regenerate with: gardenctl rc zsh > ~/.gardenctl_rc.zsh
 _gardenctl_rc=~/.gardenctl_rc.zsh
@@ -44,3 +50,9 @@ export PATH="$GOPATH/bin:$PATH"
 
 export BUILDMACHINE="NONE"
 export EDITOR="nvim"
+export TMUX_DEFAULT_TERMINAL="tmux-256color"
+
+[[ -f ~/.zsh_private ]] && source ~/.zsh_private
+
+# Machine-local secrets (not in dotfiles/git). Add LITELLM_API_KEY etc. here.
+[[ -f ~/.zshenv ]] && source ~/.zshenv
