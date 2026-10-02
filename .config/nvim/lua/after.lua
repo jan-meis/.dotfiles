@@ -274,7 +274,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 })
 
 vim.lsp.config.make_ls = {
-    cmd = {  os.getenv("GOPATH") .. "/bin/make-ls" },
+    cmd = { (os.getenv("GOPATH") or (vim.fn.expand("~") .. "/go")) .. "/bin/make-ls" },
     root_markers = { "Makefile", "makefile", "GNUmakefile" },
     filetypes = { 'make' },
 }
