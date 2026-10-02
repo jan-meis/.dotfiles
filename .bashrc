@@ -135,3 +135,4 @@ tmux::send_keys_all() {
 
 get_tmux_var () { tmux show-environment $1 | sed "s:^.*=::"; }
 
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
