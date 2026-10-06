@@ -709,14 +709,16 @@ vim.api.nvim_create_autocmd("User", {
 
 vim.keymap.set("n", "<leader>gv", ":tab Gvdiffsplit<CR>", { desc = "Git open three-way split in new tab" })
 vim.keymap.set("n", "<leader>gh", ":tab Gvdiffsplit origin/HEAD<CR>", { desc = "Git open three-way split against origin/HEAD in new tab" })
-vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f<CR>", { desc = "Git sync ammended commit with build machine" })
-vim.keymap.set("n", "<leader>gm", function() RunAsyncCommand("git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f && tmux send-keys -t 1 ENTER \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER") end, { desc = "Git sync and make on build machine" })
+vim.keymap.set("n", "<leader>gx", ":GitBlameOpenCommitURL<CR>", {desc = "Git open commit URL"})
+vim.keymap.set("n", "<leader>gb", ":GitBlameToggle<CR>", {desc = "Git blame toggle"})
+--vim.keymap.set("n", "<leader>gs", ":! git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f<CR>", { desc = "Git sync ammended commit with build machine" })
+--vim.keymap.set("n", "<leader>gm", function() RunAsyncCommand("git add . && git commit --amend --no-edit --allow-empty && git push $BUILDMACHINE -f && tmux send-keys -t 1 ENTER \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER") end, { desc = "Git sync and make on build machine" })
 
 --vim.keymap.set("n", "<leader>gm", function() vim.system({ "sh", "-c", "tmux send-keys -t 1 \"cdsrc && git switch $(git rev-parse --abbrev-ref HEAD) && cdgen && $(cat ~/build)\" ENTER" } ) end, { desc = "git sync and make on buildmachine " })
-vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTER<CR>", { desc = "Git make on buildmachine" })
-vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "Git ammend commit message" })
-vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "Git create new commit" })
-vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
+--vim.keymap.set("n", "<leader>gM", ":!tmux send-keys -t 1 \"$(cat ~/build)\" ENTER<CR>", { desc = "Git make on buildmachine" })
+--vim.keymap.set("n", "<leader>ga", ":silent Git commit -a --amend --allow-empty<CR>", { desc = "Git ammend commit message" })
+--vim.keymap.set("n", "<leader>gc", ":silent Git commit -a --allow-empty<CR><CR>", { desc = "Git create new commit" })
+--vim.keymap.set("n", "<leader>gb", ":0,3Git blame<CR>", { desc = "Git blame current line" })
 vim.api.nvim_create_autocmd("User", {
     pattern = "FugitiveIndex",
     callback = function(args)

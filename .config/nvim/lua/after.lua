@@ -62,6 +62,7 @@ require('kanagawa').setup({
   overrides = function(colors)
     return {
       NonText = { fg = '#b0b0b0' },
+      GitBlame = { fg = '#858585' }, -- slightly lighter gray than comments
       CopilotSuggestion = { fg = '#7f848e', italic = true },
       ComplHint = { fg = '#7f848e', italic = true },
     }
@@ -81,6 +82,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         end
     end,
 })
+
+vim.g.git_messenger_floating_win_opts = { border = "single" }
+vim.g.git_messenger_popup_content_margins = false
+vim.g.git_messenger_always_into_popup = true
+
 
 function ClearRegisters()
     local regs = {
@@ -178,8 +184,10 @@ function Telescope_setup()
             mappings = {
                 i = {
                     ["<C-h>"] = "which_key",
-                    -- replaces nvim_buf_delete with vim.cmd("bd") to avoid global marks being deleted
-                    ["<c-d>"] = function(prompt_bufnr)
+                    -- replaces nvim_buf_delete with vim.cmd("bd") to avoid global marks being deleted.
+                    -- Bound to <M-d> (not <C-d>) so <C-d> stays Telescope's default
+                    -- preview_scrolling_down in every picker.
+                    ["<M-d>"] = function(prompt_bufnr)
                         local action_state = require "telescope.actions.state"
                         local current_picker = action_state.get_current_picker(prompt_bufnr)
 
@@ -738,4 +746,3 @@ Codecompanion_config = {
 
 
 vim.cmd("highlight Cursor gui=NONE guifg=bg guibg=#C8C093")
-

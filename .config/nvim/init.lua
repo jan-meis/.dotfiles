@@ -245,6 +245,8 @@ Spec = {
             end, { desc = "Toggle a nameless bookmark on the current line into the active list." })
 
             vim.keymap.set("n", "mm", "<cmd>BookmarksQuickMark<cr>", { desc = "Quick bookmark (no name)" })
+            vim.keymap.set("n", "mf", "<cmd>BookmarksGotoNextInList<cr>", { desc = "Go forward to next bookmark" })
+            vim.keymap.set("n", "mb", "<cmd>BookmarksGotoPrevInList<cr>", { desc = "Go backward to last bookmark" })
 
             -- Goto picker forced into telescope's vertical layout (leaves global telescope
             -- defaults untouched; opts flow straight into telescope's pickers.new).
@@ -330,15 +332,6 @@ Spec = {
             require('codecompanion').setup(Codecompanion_config)
         end,
     },
-    -- {
-    --     'MeanderingProgrammer/render-markdown.nvim',
-    --     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
-    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-    --     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    --     ---@module 'render-markdown'
-    --     ---@type render.md.UserConfig
-    --     opts = {},
-    -- },
     {
         "dk949/file_line.nvim",
         main = "file_line",
@@ -375,6 +368,25 @@ Spec = {
         end,
     },
     { "olrtg/nvim-copy-deep-path", config = true },
+    { 'rhysd/git-messenger.vim', event = "VeryLazy" },
+    {
+        "f-person/git-blame.nvim",
+        -- load the plugin at startup
+        event = "VeryLazy",
+        -- Because of the keys part, you will be lazy loading this plugin.
+        -- The plugin will only load once one of the keys is used.
+        -- If you want to load the plugin at startup, add something like event = "VeryLazy",
+        -- or lazy = false. One of both options will work.
+        opts = {
+            -- your configuration comes here
+            -- for example
+            enabled = true, -- if you want to enable the plugin
+            highlight_group = "GitBlame",
+            message_template = "    » <author>, <date>: <summary> «", -- template for the blame message, check the Message template section for more options
+            date_format = "%b %Y", -- template for the date, check Date format section for more options
+            virtual_text_column = 1, -- virtual text start column, check Start virtual text at column section for more options
+        },
+    },
 }
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_includes.lua")) then
