@@ -54,7 +54,7 @@ vim.opt.foldmethod = "indent"
 vim.opt.foldlevel = 99
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "160"
+-- vim.opt.colorcolumn = "160" -- column for long lines
 vim.opt.signcolumn = 'yes'
 vim.filetype.add({ extension = { gmk = "make", icp = "jsp", machine_specific = "bash" } })
 vim.g.undotree_SetFocusWhenToggle = 1
@@ -86,6 +86,20 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 vim.g.git_messenger_floating_win_opts = { border = "single" }
 vim.g.git_messenger_popup_content_margins = false
 vim.g.git_messenger_always_into_popup = true
+
+-- Filter quickfix entries by filename using a case-sensitive Vim regex.
+vim.api.nvim_create_user_command("QFilter", function(opts)
+    local items = vim.tbl_filter(function(item)
+        local matches = vim.fn.match(vim.fn.bufname(item.bufnr), "\\C" .. opts.args) >= 0
+        return matches ~= opts.bang
+    end, vim.fn.getqflist())
+    vim.fn.setqflist(items)
+end, {
+    bang = true,
+    nargs = 1,
+    complete = "file",
+    desc = "Filter quickfix filenames by regex (use ! to exclude matches)",
+})
 
 
 function ClearRegisters()
@@ -164,10 +178,10 @@ vim.api.nvim_create_autocmd("User", {
     end
 })
 
--- Telescope configuration. Defined as a global (like Codecompanion_config) and
+-- Telescope configuration. Defined as a global and
 -- called from telescope.nvim's lazy `config` in init.lua, so telescope loads on
 -- first use (a keymap require) rather than eagerly at startup. Also wires
--- mini.pick as vim.ui.select and bqf preview options, both wanted on first pick.
+-- mini.pick as vim.ui.select, wanted on first pick.
 function Telescope_setup()
     local lga_actions = require("telescope-live-grep-args.actions")
     local actions = require("telescope.actions")
@@ -262,10 +276,6 @@ function Telescope_setup()
         window = { config = win_config },
     })
     vim.ui.select = require('mini.pick').ui_select
-
-    -- Better quickfix
-    require('bqf.config').preview.winblend = 0
-    require('bqf.config').preview.win_height = 999
 end
 
 pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
@@ -706,43 +716,7 @@ vim.api.nvim_create_autocmd("InsertEnter", {
         vim.lsp.inline_completion.enable(true)
     end,
 })
-
-
--- CodeCompanion settings
-Codecompanion_config = {
-    display = {
-        chat = {
-            icons = {
-                buffer_sync_all = "󰪴 ",
-                buffer_sync_diff = " ",
-                chat_context = " ",
-                chat_fold = " ",
-                tool_pending = "  ",
-                tool_in_progress = "  ",
-                tool_failure = "  ",
-                tool_success = "  ",
-            },
-            window = {
-                layout = "float",
-                width = 0.85,
-                height = .99,
-                border = "rounded",
-            },
-        },
-    },
-    interactions = {
-        chat = {},
-    },
-    extensions = {
-        spinner = {},
-        history = {
-            enabled = true,
-            opts = {
-                dir_to_save = vim.fn.stdpath("data") .. "/codecompanion_chats.json",
-            }
-        }
-    }
-}
-
-
 vim.cmd("highlight Cursor gui=NONE guifg=bg guibg=#C8C093")
+
+-- Persistent file history/bookmarks and action defaults; remap.lua only binds keys.
+require("remap_helpers").setup()

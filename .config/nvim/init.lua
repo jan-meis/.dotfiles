@@ -76,7 +76,7 @@ Spec = {
     -- undo forever
     { "mbbill/undotree",                         cmd = "UndotreeToggle" },
     -- git
-    { "tpope/vim-fugitive",                      cmd = { "G", "Git", "Gvdiffsplit", "Gtabedit" } },
+    { "tpope/vim-fugitive",                      cmd = { "G", "Git", "Gvdiffsplit", "Gtabedit", "GBrowse" } },
     { "tpope/vim-rhubarb",                       event = { "VeryLazy" } },
     -- LSP auto setup. mason-lspconfig's setup() enables installed servers via
     -- vim.lsp.enable() (automatic_enable = true by default), so it must run for
@@ -174,7 +174,11 @@ Spec = {
         end,
     },
     -- prettiier quickfix list
-    { 'kevinhwang91/nvim-bqf',     ft = 'qf' },
+    {
+        'kevinhwang91/nvim-bqf',
+        ft = 'qf',
+        opts = { preview = { winblend = 0, win_height = 999 } },
+    },
     -- key help
     {
         "folke/which-key.nvim",
@@ -186,7 +190,7 @@ Spec = {
         },
         keys = {
             {
-                "<leader>?",
+                "<leader>h?",
                 function()
                     require("which-key").show({ global = false })
                 end,
@@ -194,94 +198,6 @@ Spec = {
             },
         },
     },
-    -- better global marks
-    {
-        "LintaoAmons/bookmarks.nvim",
-        event = "VeryLazy",
-        -- pin the plugin at specific version for stability
-        -- backup your bookmark sqlite db when there are breaking changes (major version change)
-        tag = "v4.0.0",
-        dependencies = {
-            { "kkharji/sqlite.lua" },
-            -- picker backend (choose one):
-            -- {"folke/snacks.nvim"},              -- default picker backend
-            { "nvim-telescope/telescope.nvim" }, -- set picker.picker_backend = "telescope" to use
-        },
-        config = function()
-            local opts = {
-                picker = {
-                    picker_backend = "telescope", -- "snacks" (default) or "telescope"
-                    -- Show the file path relative to cwd (":." modifier) instead of the
-                    -- default abbreviated absolute path. Lead with the (varying) path so
-                    -- Telescope's sorter has distinct ordinal text to rank by — leading with
-                    -- the name flattened ordering because unnamed marks all tie.
-                    entry_display = function(bookmark, bookmarks)
-                        local relpath = vim.fn.fnamemodify(bookmark.location.path, ":.")
-                        local suffix = bookmark.name ~= "" and (" │ " .. bookmark.name) or ""
-                        return string.format("%s:%d%s", relpath, bookmark.location.line, suffix)
-                    end,
-                },
-                signs = {
-                    mark = {
-                        -- match the "normal" background so the bookmarked line isn't tinted
-                        line_bg = "#1f1f28",
-                    },
-                    -- drop the leading "<order>: " number; just show the name (empty for quick-marks)
-                    desc_format = function(bookmark)
-                        return bookmark.name
-                    end,
-                },
-            }                                -- check the "./lua/bookmarks/default-config.lua" file for all the options
-            require("bookmarks").setup(opts) -- you must call setup to init sqlite db
-
-            -- Quick (nameless) bookmark toggle: like :BookmarksMark but with no name prompt.
-            vim.api.nvim_create_user_command("BookmarksQuickMark", function()
-                local Service = require("bookmarks.domain.service")
-                local Sign    = require("bookmarks.sign")
-                local Tree    = require("bookmarks.tree.operate")
-                Service.toggle_mark("")
-                Sign.safe_refresh_signs()
-                pcall(Tree.refresh)
-            end, { desc = "Toggle a nameless bookmark on the current line into the active list." })
-
-            vim.keymap.set("n", "mm", "<cmd>BookmarksQuickMark<cr>", { desc = "Quick bookmark (no name)" })
-            vim.keymap.set("n", "mf", "<cmd>BookmarksGotoNextInList<cr>", { desc = "Go forward to next bookmark" })
-            vim.keymap.set("n", "mb", "<cmd>BookmarksGotoPrevInList<cr>", { desc = "Go backward to last bookmark" })
-
-            -- Goto picker forced into telescope's vertical layout (leaves global telescope
-            -- defaults untouched; opts flow straight into telescope's pickers.new).
-            -- Also restores most-recently-visited-on-top: v4.0.0's picker never sorts by
-            -- visited_at (the sort_by config key is unused), so we pre-sort the list and
-            -- hand it in via opts.bookmarks. Telescope keeps this order until you type.
-            vim.api.nvim_create_user_command("BookmarksGotoVertical", function()
-                local Picker      = require("bookmarks.picker")
-                local Service     = require("bookmarks.domain.service")
-                local Sign        = require("bookmarks.sign")
-                local Repo        = require("bookmarks.domain.repo")
-                local Node        = require("bookmarks.domain.node")
-
-                local active_list = Repo.ensure_and_get_active_list()
-                local marks       = Node.get_all_bookmarks(active_list)
-                table.sort(marks, function(a, b)
-                    return (a.visited_at or 0) > (b.visited_at or 0)
-                end)
-
-                Picker.pick_bookmark(function(bookmark)
-                    if bookmark then
-                        Service.goto_bookmark(bookmark.id)
-                        Sign.safe_refresh_signs()
-                    end
-                end, {
-                    bookmarks = marks,
-                    layout_strategy = "vertical",
-                    layout_config = { preview_height = 0.7 },
-                })
-            end, { desc = "Goto a bookmark (vertical layout, most-recently-visited first)." })
-        end,
-    },
-
-    -- run :BookmarksInfo to see the running status of the plugin
-
     -- write with sudo
     { "lambdalisue/vim-suda",      cmd = { "SudaWrite", "SudaRead" } },
     -- prettier movement animation
@@ -315,23 +231,6 @@ Spec = {
     -- first InsertEnter; the enable/disable call lives in after.lua's InsertEnter
     -- handler.
     { "github/copilot.vim",        event = "InsertEnter" },
-    {
-        "olimorris/codecompanion.nvim",
-        cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "franco-ruggeri/codecompanion-spinner.nvim",
-            "ravitemer/codecompanion-history.nvim", -- history extension
-            "agentclientprotocol/claude-agent-acp"
-        },
-        -- Loaded lazily on first :CodeCompanion* command. Config is the global
-        -- Codecompanion_config, fully built by lua/after.lua +
-        -- lua/machine_specific_after.lua during startup (both run long before any
-        -- command can fire), so reading it here at load time is safe.
-        config = function()
-            require('codecompanion').setup(Codecompanion_config)
-        end,
-    },
     {
         "dk949/file_line.nvim",
         main = "file_line",
@@ -367,8 +266,8 @@ Spec = {
             end, { desc = "Copy YAML key path" })
         end,
     },
-    { "olrtg/nvim-copy-deep-path", config = true },
-    { 'rhysd/git-messenger.vim', event = "VeryLazy" },
+    { "olrtg/nvim-copy-deep-path", config = true,        event = "VeryLazy" },
+    { 'rhysd/git-messenger.vim',   event = "VeryLazy" },
     {
         "f-person/git-blame.nvim",
         -- load the plugin at startup
@@ -380,13 +279,46 @@ Spec = {
         opts = {
             -- your configuration comes here
             -- for example
-            enabled = true, -- if you want to enable the plugin
+            enabled = true,                                           -- if you want to enable the plugin
             highlight_group = "GitBlame",
             message_template = "    » <author>, <date>: <summary> «", -- template for the blame message, check the Message template section for more options
-            date_format = "%b %Y", -- template for the date, check Date format section for more options
-            virtual_text_column = 1, -- virtual text start column, check Start virtual text at column section for more options
+            date_format = "%b. %Y",                                   -- template for the date, check Date format section for more options
+            virtual_text_column = 1,                                  -- virtual text start column, check Start virtual text at column section for more options
         },
     },
+    {
+        "folke/flash.nvim",
+        event = "VeryLazy",
+        ---@type Flash.Config
+        opts = {
+            highlight = {
+                -- don't dim the rest of the buffer when flashing
+                backdrop = false,
+            },
+            modes = {
+                char = {
+                    config = function(opts)
+                        -- Flash defaults to hiding after yanks only. Hide after
+                        -- any operator (dt, ct; etc.), but keep normal f/t repeats.
+                        opts.autohide = opts.autohide or vim.fn.mode(true):sub(1, 2) == "no"
+                        -- Keep Flash's default count/macro guard when replacing
+                        -- its char-mode config callback.
+                        opts.jump_labels = opts.jump_labels
+                            and vim.v.count == 0
+                            and vim.fn.reg_executing() == ""
+                            and vim.fn.reg_recording() == ""
+                    end,
+                },
+            },
+        },
+        keys = {
+            { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+            { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
+            { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+            { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+            { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+        },
+    }
 }
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_includes.lua")) then

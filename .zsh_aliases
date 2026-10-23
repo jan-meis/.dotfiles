@@ -14,6 +14,16 @@ recent() {
   find . -type f -not -path './.git/*' -exec /usr/bin/stat -f '%m %Sm %N' {} + | sort -rn | head -"${1:-10}"
 }
 
+removecolorcodes() {
+  perl -pe 's/\e\[[0-9;]*m//g' "$@"
+}
+
+plaintee() {
+  {
+    command tee /dev/fd/3 | removecolorcodes | command tee "$@" > /dev/null
+  } 3>&1
+}
+
 # logs with vim
 logvim() {
   local dir="/tmp/mylogs"
