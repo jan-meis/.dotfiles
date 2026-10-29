@@ -13,7 +13,16 @@ vim.keymap.set("c", "<C-CR>", "<CR><Cmd>nohlsearch<CR>", { silent = true, desc =
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection up" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Move next line up to current line" })
-vim.keymap.set("i", "<Tab>", "<C-v><Tab>", { desc = "Tab" })
+
+-- Navigate native snippet placeholders without changing COQ's completion keys.
+for key, direction in pairs({ ["<C-f>"] = 1, ["<C-b>"] = -1 }) do
+  vim.keymap.set({ "i", "s" }, key, function()
+    if vim.snippet.active({ direction = direction }) then
+      return "<Cmd>lua vim.snippet.jump(" .. direction .. ")<CR>"
+    end
+    return key
+  end, { expr = true, silent = true, desc = direction == 1 and "Next snippet placeholder" or "Previous snippet placeholder" })
+end
 vim.keymap.set("n", "<leader>ht", function() vim.cmd("set list!") end, { desc = "Toggle tab visibility" })
 vim.keymap.set("n", "<leader>t", "<C-w>T", { desc = "Maximize current split" })
 vim.keymap.set("n", "<C-w>e", ":vnew | q<CR>", { desc = "Equalize  splits" })

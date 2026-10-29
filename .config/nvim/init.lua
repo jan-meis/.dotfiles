@@ -125,11 +125,34 @@ Spec = {
     },
     { 'neovim/nvim-lspconfig',   event = { "BufReadPre", "BufNewFile" } },
     { 'lucasecdb/godot-wsl-lsp', ft = { "gd", "gdscript" } },
-    -- autocomplete — all deferred to first insert/cmdline entry
-    { 'hrsh7th/cmp-nvim-lsp',    event = { 'InsertEnter', 'CmdlineEnter' } },
-    { 'hrsh7th/nvim-cmp',        event = { 'InsertEnter', 'CmdlineEnter' } },
-    { 'hrsh7th/cmp-cmdline',     event = { 'CmdlineEnter' } },
-    { 'hrsh7th/cmp-path',        event = { 'InsertEnter', 'CmdlineEnter' } },
+    -- COQ v2 uses Neovim 0.12's native LSP capabilities and snippet engine.
+    {
+        'ms-jpq/coq_nvim',
+        branch = 'coq',
+        event = 'InsertEnter',
+        dependencies = {
+            { 'ms-jpq/coq.artifacts', branch = 'artifacts' },
+        },
+        opts = {
+            keymap = { pre_select = true },
+            display = {
+                icons = { mode = 'short' },
+                ghost_text = { enabled = false }, -- leave inline suggestions to Copilot
+                preview = {
+                    positions = { east = 1, north = false, south = false, west = false },
+                },
+            },
+        },
+        config = function(_, opts)
+            -- COQ's CompleteChanged handler ignores ghost_text.enabled.
+            if opts.display.ghost_text.enabled == false then
+                local ghost = require('coq.completions.ghost')
+                ghost.show = function(ctx) ghost.clear(ctx.buf) end
+            end
+            require('coq').setup(opts)
+            require('coq_commit').setup()
+        end,
+    },
     -- live grep / fuzzy finder — lazy-loaded on first `require('telescope...')`
     -- from a keymap (lazy.nvim hooks package loaders, so requiring any telescope
     -- module loads the plugin and runs `config` below first). Extensions ride in
@@ -361,6 +384,15 @@ require("lazy").setup({
 
 require("after")
 require("remap")
+
+-- Use native bracket matching in Go; matchit's syntax filtering can skip code braces.
+vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("GoNativeBracketMatching", { clear = true }),
+    pattern = "go",
+    callback = function()
+        vim.keymap.set("n", "%", "%", { buffer = true, remap = false })
+    end,
+})
 
 if (file_exists(vim.fn.stdpath("config") .. "/lua/machine_specific_after.lua")) then
     require("machine_specific_after")
