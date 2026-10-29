@@ -1,5 +1,7 @@
 copy-on-select = clipboard
 keybind = f13=text:\x1b[25~
+keybind = ctrl+tab=csi:9;5u
+keybind = ctrl+shift+tab=csi:1;3A
 font-size = 13
 cursor-style = block
 cursor-style-blink = true

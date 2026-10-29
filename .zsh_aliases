@@ -5,6 +5,7 @@ alias reloadaliases='source ~/.zsh_aliases'
 alias grep='grep --color=auto'
 alias kubectl="kubecolor "
 alias k="kubecolor "
+alias kc="kubecolor --force-colors"
 alias v="viddy "
 alias lg="lazygit"
 
