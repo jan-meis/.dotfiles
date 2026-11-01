@@ -36,6 +36,8 @@ vim.keymap.set("n", "<C-7>", function() history.step(-1, vim.v.count1) end, { de
 vim.keymap.set("n", "<C-_>", function() history.step(-1, vim.v.count1) end, { desc = "Newer recent buffer" })
 
 -- Clipboard / yank / paste
+vim.keymap.set("x", "p", "P", { desc = "Replace selection, preserving paste register" })
+--vim.keymap.set("x", "P", "p", { desc = "Replace selection, yanking replaced text" })
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
 vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank to clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", [["+p]], { desc = "Paste from clipboard (after)" })
@@ -55,6 +57,11 @@ vim.keymap.set("n", "grd", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Go
 vim.keymap.set("n", "grD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { desc = "Go to declaration" })
 vim.keymap.set("n", "<leader>o", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Open diagnostic" })
 vim.keymap.set("i", "<F9>", function()
+  -- Cancel the popup before applying inline text; otherwise COQ's Esc/Ctrl-E
+  -- cancellation restores the pre-completion text and erases the accepted edit.
+  if vim.fn.pumvisible() == 1 then
+    return "<C-e><Cmd>lua vim.lsp.inline_completion.get()<CR>"
+  end
   if not vim.lsp.inline_completion.get() then return "<F9>" end
 end, { expr = true, desc = "Accept the current inline completion" })
 vim.keymap.set({ "n", "x", "v" }, "<F3>", function()
